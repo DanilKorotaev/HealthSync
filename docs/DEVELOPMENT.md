@@ -38,6 +38,7 @@ xcodebuild test -scheme HealthSync -destination 'platform=iOS Simulator,name=iPh
 ## CI quality gates
 
 - CI workflow is defined in `.github/workflows/ci.yml`.
+- **No XcodeGen on CI runners:** `HealthSync.xcodeproj` is committed; GitHub Actions does not run `xcodegen` (it is not installed by default). After changing `project.yml`, run `xcodegen generate` locally and commit the updated `.xcodeproj`.
 - Every PR runs tests with `-enableCodeCoverage YES`.
 - Coverage threshold is enforced by `MIN_COVERAGE` (current baseline: `35`).
 - PR template requires explicit confirmation for tests, protocol-first design, and secrets policy.

@@ -27,6 +27,17 @@ final class HealthKitServiceTests: XCTestCase {
         }
     }
 
+    func testDailyAggregationInputStubMatchesCalendarDay() async throws {
+        let sut = HealthKitService(healthStore: HealthStoreMock())
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        let date = try XCTUnwrap(formatter.date(from: "2026-04-10T15:00:00Z"))
+        let input = try await sut.dailyAggregationInput(for: date)
+        XCTAssertEqual(input.date, "2026-04-10")
+        XCTAssertNotNil(input.syncedAt)
+    }
+
     func testRequestReadAuthorizationRequestsExpectedTypes() async throws {
         let store = HealthStoreMock(isHealthDataAvailable: true)
         let sut = HealthKitService(healthStore: store)

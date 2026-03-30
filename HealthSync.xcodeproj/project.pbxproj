@@ -8,14 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		0D16611260CB9EDBE7A38281 /* HealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1F30BE3523F66F79699862 /* HealthDataView.swift */; };
+		0DCF4799CF3F2920BD2A31E4 /* CalendarDayFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867F948486D0BE59811F5219 /* CalendarDayFormatterTests.swift */; };
 		145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */; };
 		153A66969FCBD643EE51D4D4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B39CD5B7BB962D073392F1 /* SettingsView.swift */; };
 		16167B727650A89975C1E13D /* SyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094DFCD7D1A07EA602A75BDA /* SyncState.swift */; };
 		19A69A4BA9340469BEAEF5F0 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B511AA729897F9B29183257 /* HealthKitService.swift */; };
 		219CEF66A15379F32A2FEDC4 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA630B3224FE300C4B6517F /* SyncStatusView.swift */; };
+		24A721DCB9B867B1D88E4CAB /* CalendarDayFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CADEF46058EF9414AE941532 /* CalendarDayFormatter.swift */; };
 		332490CC3EBB8352CCA6750B /* NextCloudServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */; };
 		33E0705156CA87C81583B01A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D242B2A9BD67C9562869AFF9 /* Assets.xcassets */; };
 		3C33AA46066C81B2C6D7DEC7 /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6D23011F987B4AFB7CDACD /* SyncService.swift */; };
+		3D4DA6ECF7DE7520825A8A01 /* SyncWebhookClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359D17F6E04B59AB729F5FA2 /* SyncWebhookClient.swift */; };
 		46CC6703D928F16E0EA0088B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323004A8B8E2062FD80AEE59 /* AppDelegate.swift */; };
 		4AC001610803802C77880E9F /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5A1E43C49183F6ACCBD92C /* AppConfiguration.swift */; };
 		4DA32C545EB461146CB26B86 /* BackgroundSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3378206379BD177341D9A15 /* BackgroundSyncService.swift */; };
@@ -47,6 +50,7 @@
 		202097FCB243CEBE3847B9E0 /* NextCloudService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextCloudService.swift; sourceTree = "<group>"; };
 		27EE9A8EF06326D187CCDCA1 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		323004A8B8E2062FD80AEE59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		359D17F6E04B59AB729F5FA2 /* SyncWebhookClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWebhookClient.swift; sourceTree = "<group>"; };
 		3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextCloudServiceTests.swift; sourceTree = "<group>"; };
 		3E527C53771A23331E32D5AC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		54DBD474E25098FD00E72D00 /* WorkoutData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutData.swift; sourceTree = "<group>"; };
@@ -54,11 +58,13 @@
 		7AA630B3224FE300C4B6517F /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
 		7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
 		81985FF3F8B7DDC9DBE81470 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		867F948486D0BE59811F5219 /* CalendarDayFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayFormatterTests.swift; sourceTree = "<group>"; };
 		8B50444D1E9453BC869D9FAF /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		8B511AA729897F9B29183257 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		93B39CD5B7BB962D073392F1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncServiceTests.swift; sourceTree = "<group>"; };
 		BE5A1E43C49183F6ACCBD92C /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		CADEF46058EF9414AE941532 /* CalendarDayFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayFormatter.swift; sourceTree = "<group>"; };
 		D242B2A9BD67C9562869AFF9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D3378206379BD177341D9A15 /* BackgroundSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncService.swift; sourceTree = "<group>"; };
 		D370141F468BA00615662572 /* HealthSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncApp.swift; sourceTree = "<group>"; };
@@ -98,6 +104,7 @@
 				372A84D72ECEB15019BC08B3 /* Models */,
 				7A4D923A51045AB5165B6B10 /* Resources */,
 				C89201485CA09B7DAAF6BA19 /* Services */,
+				8404F49EDCF1C9F39660778D /* Utilities */,
 				29CA5448C1EE2E1164C71F47 /* Views */,
 			);
 			path = HealthSync;
@@ -107,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */,
+				867F948486D0BE59811F5219 /* CalendarDayFormatterTests.swift */,
 				E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */,
 				3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */,
 				9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */,
@@ -155,6 +163,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		8404F49EDCF1C9F39660778D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				CADEF46058EF9414AE941532 /* CalendarDayFormatter.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		C89201485CA09B7DAAF6BA19 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +179,7 @@
 				117366DCA5D49F45A98790FF /* KeychainCredentialsStore.swift */,
 				202097FCB243CEBE3847B9E0 /* NextCloudService.swift */,
 				ED6D23011F987B4AFB7CDACD /* SyncService.swift */,
+				359D17F6E04B59AB729F5FA2 /* SyncWebhookClient.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -295,6 +312,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */,
+				0DCF4799CF3F2920BD2A31E4 /* CalendarDayFormatterTests.swift in Sources */,
 				E7DEA0756868976D57F4A230 /* HealthKitServiceTests.swift in Sources */,
 				332490CC3EBB8352CCA6750B /* NextCloudServiceTests.swift in Sources */,
 				145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */,
@@ -308,6 +326,7 @@
 				4AC001610803802C77880E9F /* AppConfiguration.swift in Sources */,
 				46CC6703D928F16E0EA0088B /* AppDelegate.swift in Sources */,
 				4DA32C545EB461146CB26B86 /* BackgroundSyncService.swift in Sources */,
+				24A721DCB9B867B1D88E4CAB /* CalendarDayFormatter.swift in Sources */,
 				B1E180946477E16B8C6EE73D /* DailyHealthData.swift in Sources */,
 				0D16611260CB9EDBE7A38281 /* HealthDataView.swift in Sources */,
 				19A69A4BA9340469BEAEF5F0 /* HealthKitService.swift in Sources */,
@@ -319,6 +338,7 @@
 				3C33AA46066C81B2C6D7DEC7 /* SyncService.swift in Sources */,
 				16167B727650A89975C1E13D /* SyncState.swift in Sources */,
 				219CEF66A15379F32A2FEDC4 /* SyncStatusView.swift in Sources */,
+				3D4DA6ECF7DE7520825A8A01 /* SyncWebhookClient.swift in Sources */,
 				54A78926B4A8ACBAF54DC488 /* WorkoutData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

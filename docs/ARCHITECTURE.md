@@ -17,7 +17,8 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 | `AppConfiguration` | Reads `HEALTHSYNC_*` env and UserDefaults |
 | `HealthKitService` | Explicit read type set + authorization flow + daily/workout mapper aggregation |
 | `NextCloudService` | Keychain credentials + PROPFIND validation + PUT retry/backoff |
-| `SyncService`, `BackgroundSyncService` | Stubs |
+| `SyncService` | Daily JSON + `sync_state.json` upload + optional webhook |
+| `BackgroundSyncService` | Stub |
 | Models (`DailyHealthData`, `WorkoutData`, `SyncState`) | Daily/workout export structures implemented |
 
 ## Planned modules

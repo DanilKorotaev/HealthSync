@@ -7,3 +7,4 @@
 | [Test infrastructure and coverage baseline](tasks/completed/task-testing-coverage-baseline.md) | 2026-03-30 |
 | [HealthKit read path and permissions](tasks/completed/task-feature-healthkit-read.md) | 2026-03-31 |
 | [Nextcloud WebDAV upload and Keychain credentials](tasks/completed/task-feature-nextcloud-webdav.md) | 2026-03-31 |
+| [Sync orchestration and JSON export](tasks/completed/task-feature-sync-orchestration.md) | 2026-03-31 |

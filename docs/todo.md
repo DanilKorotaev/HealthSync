@@ -2,13 +2,9 @@
 
 ## In progress
 
-- [🚧] [Sync orchestration and JSON export](tasks/pending/task-feature-sync-orchestration.md) — next logical implementation step
+- [🚧] [Background delivery + background URLSession](tasks/pending/task-feature-background-sync.md)
 
 ## Planned
-
-### Core
-
-- [ ] [Background delivery + background URLSession](tasks/pending/task-feature-background-sync.md)
 
 ### Product / ops
 

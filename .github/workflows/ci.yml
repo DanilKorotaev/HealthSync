@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+# Opt into Node.js 24 for actions (see GitHub changelog on Node 20 deprecation).
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test-and-coverage:
     runs-on: macos-latest
@@ -20,16 +24,30 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Generate project
-        run: xcodegen generate
+      # `HealthSync.xcodeproj` is committed; run `xcodegen generate` locally after editing `project.yml`.
 
-      - name: Pick simulator
+      - name: Pick iOS Simulator
         run: |
-          DEVICE_NAME=$(xcrun simctl list devices available | rg "iPhone" -m 1 | sed -E 's/^[[:space:]]*([^\\(]+) \\(.*/\\1/' | xargs)
-          if [ -z "$DEVICE_NAME" ]; then
-            echo "No available iPhone simulator found."
-            exit 1
-          fi
+          DEVICE_NAME=$(python3 - <<'PY'
+          import subprocess, re, sys
+          r = subprocess.run(
+              ["xcodebuild", "-showdestinations", "-scheme", "HealthSync"],
+              capture_output=True,
+              text=True,
+              cwd=".",
+          )
+          if r.returncode != 0:
+              print("iPhone 15", end="")
+              sys.exit(0)
+          for line in r.stdout.splitlines():
+              if "platform:iOS Simulator" in line and "iPhone" in line:
+                  m = re.search(r"name:([^,}]+)", line)
+                  if m:
+                      print(m.group(1).strip(), end="")
+                      sys.exit(0)
+          print("iPhone 15", end="")
+          PY
+          )
           echo "DEVICE_NAME=$DEVICE_NAME" >> "$GITHUB_ENV"
           echo "Using simulator: $DEVICE_NAME"
 

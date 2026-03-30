@@ -5,6 +5,8 @@ protocol HealthKitServiceProtocol {
     var isHealthDataAvailable: Bool { get }
     var requiredReadTypes: Set<HKObjectType> { get }
     func requestReadAuthorization() async throws
+    /// Placeholder until anchored queries are implemented; supplies structured input for export.
+    func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput
     func makeDailyHealthData(from input: DailyAggregationInput) -> DailyHealthData
     func makeWorkoutData(from input: WorkoutAggregationInput) -> WorkoutData
 }
@@ -110,6 +112,26 @@ final class HealthKitService: HealthKitServiceProtocol {
             throw HealthKitServiceError.healthDataUnavailable
         }
         try await healthStore.requestAuthorization(toShare: nil, read: requiredReadTypes)
+    }
+
+    func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput {
+        let day = CalendarDayFormatter.yyyyMMdd(for: date)
+        let syncedAt = CalendarDayFormatter.iso8601UTCSeconds(from: Date())
+        return DailyAggregationInput(
+            date: day,
+            steps: 0,
+            distanceKm: 0,
+            activeCalories: 0,
+            basalCalories: 0,
+            exerciseMinutes: 0,
+            standHours: 0,
+            restingHeartRate: nil,
+            hrvValues: [],
+            oxygenSaturationValues: [],
+            heartRateValues: [],
+            sleep: nil,
+            syncedAt: syncedAt
+        )
     }
 
     func makeDailyHealthData(from input: DailyAggregationInput) -> DailyHealthData {
