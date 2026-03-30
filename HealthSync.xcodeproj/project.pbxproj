@@ -25,6 +25,7 @@
 		BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */; };
 		C8AEF35C25C4E1D8CCE72E20 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B50444D1E9453BC869D9FAF /* MainView.swift */; };
 		E78E7BA17FB87769DB5E9E8D /* NextCloudService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202097FCB243CEBE3847B9E0 /* NextCloudService.swift */; };
+		E7DEA0756868976D57F4A230 /* HealthKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		D3378206379BD177341D9A15 /* BackgroundSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncService.swift; sourceTree = "<group>"; };
 		D370141F468BA00615662572 /* HealthSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncApp.swift; sourceTree = "<group>"; };
 		D92CE2F934402A2792EA2996 /* HealthSyncTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = HealthSyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitServiceTests.swift; sourceTree = "<group>"; };
 		EA1F30BE3523F66F79699862 /* HealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDataView.swift; sourceTree = "<group>"; };
 		ED6D23011F987B4AFB7CDACD /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		F040879BF50CADE1FE9031E9 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */,
+				E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */,
 				9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */,
 			);
 			path = HealthSyncTests;
@@ -286,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */,
+				E7DEA0756868976D57F4A230 /* HealthKitServiceTests.swift in Sources */,
 				145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

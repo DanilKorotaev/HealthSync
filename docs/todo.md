@@ -2,14 +2,12 @@
 
 ## In progress
 
-_None._
+- [🚧] [Nextcloud WebDAV upload + Keychain credentials](tasks/pending/task-feature-nextcloud-webdav.md) — next logical implementation step
 
 ## Planned
 
 ### Core
 
-- [ ] [HealthKit read path and permissions](tasks/pending/task-feature-healthkit-read.md)
-- [ ] [Nextcloud WebDAV upload + Keychain credentials](tasks/pending/task-feature-nextcloud-webdav.md)
 - [ ] [Sync orchestration and JSON export](tasks/pending/task-feature-sync-orchestration.md)
 - [ ] [Background delivery + background URLSession](tasks/pending/task-feature-background-sync.md)
 

@@ -1,6 +1,6 @@
 # HealthKit read path and permissions
 
-**Status:** Planned  
+**Status:** Done  
 **Priority:** High  
 **Category:** Feature
 
@@ -10,12 +10,13 @@ Request read access for required HealthKit types (steps, heart rate, sleep, work
 
 ## Tasks
 
-- [ ] Define explicit `HKObjectType` set and authorization flow
-- [ ] Implement daily aggregation pipeline
-- [ ] Implement workout export with zone breakdown where available
-- [ ] Unit tests with mocked `HKHealthStore` where feasible
+- [x] Define explicit `HKObjectType` set and authorization flow
+- [x] Implement daily aggregation pipeline
+- [x] Implement workout export with zone breakdown where available
+- [x] Unit tests with mocked `HKHealthStore` where feasible
 
 ## Notes
 
 - Apple Developer Program required for meaningful on-device validation.
 - Background delivery registration in `AppDelegate` after authorization.
+- Implemented in code: explicit read type set, async auth wrapper, daily/workout mappers, heart rate zone aggregation, unit tests for all public behavior.

@@ -15,7 +15,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 |------|--------|
 | SwiftUI shell (`MainView`, `SettingsView`) | Stub |
 | `AppConfiguration` | Reads `HEALTHSYNC_*` env and UserDefaults |
-| `HealthKitService` | Placeholder (`isHealthDataAvailable`) |
+| `HealthKitService` | Explicit read type set + authorization flow + daily/workout mapper aggregation |
 | `NextCloudService`, `SyncService`, `BackgroundSyncService` | Empty stubs |
 | Models (`DailyHealthData`, `WorkoutData`, `SyncState`) | Minimal Codable shapes |
 
