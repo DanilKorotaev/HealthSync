@@ -2,13 +2,12 @@
 
 ## In progress
 
-- [🚧] [Nextcloud WebDAV upload + Keychain credentials](tasks/pending/task-feature-nextcloud-webdav.md) — next logical implementation step
+- [🚧] [Sync orchestration and JSON export](tasks/pending/task-feature-sync-orchestration.md) — next logical implementation step
 
 ## Planned
 
 ### Core
 
-- [ ] [Sync orchestration and JSON export](tasks/pending/task-feature-sync-orchestration.md)
 - [ ] [Background delivery + background URLSession](tasks/pending/task-feature-background-sync.md)
 
 ### Product / ops

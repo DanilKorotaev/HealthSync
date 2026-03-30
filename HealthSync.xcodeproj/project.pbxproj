@@ -13,6 +13,7 @@
 		16167B727650A89975C1E13D /* SyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094DFCD7D1A07EA602A75BDA /* SyncState.swift */; };
 		19A69A4BA9340469BEAEF5F0 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B511AA729897F9B29183257 /* HealthKitService.swift */; };
 		219CEF66A15379F32A2FEDC4 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA630B3224FE300C4B6517F /* SyncStatusView.swift */; };
+		332490CC3EBB8352CCA6750B /* NextCloudServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */; };
 		33E0705156CA87C81583B01A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D242B2A9BD67C9562869AFF9 /* Assets.xcassets */; };
 		3C33AA46066C81B2C6D7DEC7 /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6D23011F987B4AFB7CDACD /* SyncService.swift */; };
 		46CC6703D928F16E0EA0088B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323004A8B8E2062FD80AEE59 /* AppDelegate.swift */; };
@@ -20,6 +21,7 @@
 		4DA32C545EB461146CB26B86 /* BackgroundSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3378206379BD177341D9A15 /* BackgroundSyncService.swift */; };
 		54A78926B4A8ACBAF54DC488 /* WorkoutData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54DBD474E25098FD00E72D00 /* WorkoutData.swift */; };
 		64B203D1973CC9B72FC01545 /* HealthSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D370141F468BA00615662572 /* HealthSyncApp.swift */; };
+		6E69787001769C7F9A008B1E /* KeychainCredentialsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117366DCA5D49F45A98790FF /* KeychainCredentialsStore.swift */; };
 		7F9CA8C2EA18BD1D5B5D2C64 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EE9A8EF06326D187CCDCA1 /* HealthKit.framework */; };
 		B1E180946477E16B8C6EE73D /* DailyHealthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FABA0C5A2CDD79DFFDA3E7 /* DailyHealthData.swift */; };
 		BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */; };
@@ -40,10 +42,12 @@
 
 /* Begin PBXFileReference section */
 		094DFCD7D1A07EA602A75BDA /* SyncState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncState.swift; sourceTree = "<group>"; };
+		117366DCA5D49F45A98790FF /* KeychainCredentialsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainCredentialsStore.swift; sourceTree = "<group>"; };
 		1D343810F4B4383E36DAE2F1 /* HealthSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HealthSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		202097FCB243CEBE3847B9E0 /* NextCloudService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextCloudService.swift; sourceTree = "<group>"; };
 		27EE9A8EF06326D187CCDCA1 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		323004A8B8E2062FD80AEE59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextCloudServiceTests.swift; sourceTree = "<group>"; };
 		3E527C53771A23331E32D5AC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		54DBD474E25098FD00E72D00 /* WorkoutData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutData.swift; sourceTree = "<group>"; };
 		57FABA0C5A2CDD79DFFDA3E7 /* DailyHealthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHealthData.swift; sourceTree = "<group>"; };
@@ -104,6 +108,7 @@
 			children = (
 				7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */,
 				E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */,
+				3D664D9866E3C874D0140A2B /* NextCloudServiceTests.swift */,
 				9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */,
 			);
 			path = HealthSyncTests;
@@ -155,6 +160,7 @@
 			children = (
 				D3378206379BD177341D9A15 /* BackgroundSyncService.swift */,
 				8B511AA729897F9B29183257 /* HealthKitService.swift */,
+				117366DCA5D49F45A98790FF /* KeychainCredentialsStore.swift */,
 				202097FCB243CEBE3847B9E0 /* NextCloudService.swift */,
 				ED6D23011F987B4AFB7CDACD /* SyncService.swift */,
 			);
@@ -290,6 +296,7 @@
 			files = (
 				BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */,
 				E7DEA0756868976D57F4A230 /* HealthKitServiceTests.swift in Sources */,
+				332490CC3EBB8352CCA6750B /* NextCloudServiceTests.swift in Sources */,
 				145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,6 +312,7 @@
 				0D16611260CB9EDBE7A38281 /* HealthDataView.swift in Sources */,
 				19A69A4BA9340469BEAEF5F0 /* HealthKitService.swift in Sources */,
 				64B203D1973CC9B72FC01545 /* HealthSyncApp.swift in Sources */,
+				6E69787001769C7F9A008B1E /* KeychainCredentialsStore.swift in Sources */,
 				C8AEF35C25C4E1D8CCE72E20 /* MainView.swift in Sources */,
 				E78E7BA17FB87769DB5E9E8D /* NextCloudService.swift in Sources */,
 				153A66969FCBD643EE51D4D4 /* SettingsView.swift in Sources */,

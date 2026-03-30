@@ -6,7 +6,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 
 1. Read HealthKit samples (daily aggregates and workouts).
 2. Serialize JSON into a `HealthData/` tree (daily + workouts + `sync_state.json`).
-3. Upload via **WebDAV** to Nextcloud (NextcloudKit or equivalent SPM dependency — not wired in the skeleton).
+3. Upload via **WebDAV** to Nextcloud (implemented with native URLSession wrapper + protocol abstraction).
 4. Optionally call a **webhook** after upload for server-side linking with Obsidian notes.
 
 ## Current skeleton
@@ -16,8 +16,9 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 | SwiftUI shell (`MainView`, `SettingsView`) | Stub |
 | `AppConfiguration` | Reads `HEALTHSYNC_*` env and UserDefaults |
 | `HealthKitService` | Explicit read type set + authorization flow + daily/workout mapper aggregation |
-| `NextCloudService`, `SyncService`, `BackgroundSyncService` | Empty stubs |
-| Models (`DailyHealthData`, `WorkoutData`, `SyncState`) | Minimal Codable shapes |
+| `NextCloudService` | Keychain credentials + PROPFIND validation + PUT retry/backoff |
+| `SyncService`, `BackgroundSyncService` | Stubs |
+| Models (`DailyHealthData`, `WorkoutData`, `SyncState`) | Daily/workout export structures implemented |
 
 ## Planned modules
 

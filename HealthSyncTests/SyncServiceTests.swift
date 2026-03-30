@@ -78,4 +78,12 @@ private final class NextCloudServiceMock: NextCloudServiceProtocol {
     func validateConfiguration() async throws {
         validateConfigurationCallCount += 1
     }
+
+    func saveCredentials(username: String, password: String) throws {}
+
+    func loadCredentials() throws -> NextCloudCredentials? {
+        nil
+    }
+
+    func upload(data: Data, remotePath: String, contentType: String) async throws {}
 }
