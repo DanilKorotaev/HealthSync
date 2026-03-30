@@ -33,6 +33,7 @@ Full details: [docs/SETUP.md](docs/SETUP.md).
 | [docs/SETUP.md](docs/SETUP.md) | Environment and Xcode setup |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | How to develop and regenerate the project |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module layout and planned services |
+| [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md) | Mandatory standards: protocol-first and test coverage |
 | [docs/todo.md](docs/todo.md) | Active tasks |
 | [docs/completed.md](docs/completed.md) | Completed tasks |
 

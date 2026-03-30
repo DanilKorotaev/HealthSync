@@ -1,20 +1,30 @@
 import Foundation
 
 /// Orchestrates export → upload → optional webhook (implementation in a later milestone).
-final class SyncService {
-    private let healthKit: HealthKitService
-    private let nextcloud: NextCloudService
+protocol SyncServiceProtocol {
+    func syncNow() async throws
+}
+
+enum SyncServiceError: Error, Equatable {
+    case healthDataUnavailable
+}
+
+final class SyncService: SyncServiceProtocol {
+    private let healthKit: HealthKitServiceProtocol
+    private let nextcloud: NextCloudServiceProtocol
 
     init(
-        healthKit: HealthKitService = HealthKitService(),
-        nextcloud: NextCloudService = NextCloudService()
+        healthKit: HealthKitServiceProtocol = HealthKitService(),
+        nextcloud: NextCloudServiceProtocol = NextCloudService()
     ) {
         self.healthKit = healthKit
         self.nextcloud = nextcloud
     }
 
     func syncNow() async throws {
-        _ = healthKit.isHealthDataAvailable
+        guard healthKit.isHealthDataAvailable else {
+            throw SyncServiceError.healthDataUnavailable
+        }
         try await nextcloud.validateConfiguration()
     }
 }

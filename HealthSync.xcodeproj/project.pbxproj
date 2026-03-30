@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0D16611260CB9EDBE7A38281 /* HealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1F30BE3523F66F79699862 /* HealthDataView.swift */; };
+		145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */; };
 		153A66969FCBD643EE51D4D4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B39CD5B7BB962D073392F1 /* SettingsView.swift */; };
 		16167B727650A89975C1E13D /* SyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094DFCD7D1A07EA602A75BDA /* SyncState.swift */; };
 		19A69A4BA9340469BEAEF5F0 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B511AA729897F9B29183257 /* HealthKitService.swift */; };
@@ -21,9 +22,20 @@
 		64B203D1973CC9B72FC01545 /* HealthSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D370141F468BA00615662572 /* HealthSyncApp.swift */; };
 		7F9CA8C2EA18BD1D5B5D2C64 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EE9A8EF06326D187CCDCA1 /* HealthKit.framework */; };
 		B1E180946477E16B8C6EE73D /* DailyHealthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FABA0C5A2CDD79DFFDA3E7 /* DailyHealthData.swift */; };
+		BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */; };
 		C8AEF35C25C4E1D8CCE72E20 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B50444D1E9453BC869D9FAF /* MainView.swift */; };
 		E78E7BA17FB87769DB5E9E8D /* NextCloudService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202097FCB243CEBE3847B9E0 /* NextCloudService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D7F19F04B9DC311F118284C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F4549D80C7EEB3189A9CF84C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 892A921C4AE312FBC7AB053B;
+			remoteInfo = HealthSync;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		094DFCD7D1A07EA602A75BDA /* SyncState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncState.swift; sourceTree = "<group>"; };
@@ -35,14 +47,17 @@
 		54DBD474E25098FD00E72D00 /* WorkoutData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutData.swift; sourceTree = "<group>"; };
 		57FABA0C5A2CDD79DFFDA3E7 /* DailyHealthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHealthData.swift; sourceTree = "<group>"; };
 		7AA630B3224FE300C4B6517F /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
+		7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
 		81985FF3F8B7DDC9DBE81470 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8B50444D1E9453BC869D9FAF /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		8B511AA729897F9B29183257 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		93B39CD5B7BB962D073392F1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncServiceTests.swift; sourceTree = "<group>"; };
 		BE5A1E43C49183F6ACCBD92C /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		D242B2A9BD67C9562869AFF9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D3378206379BD177341D9A15 /* BackgroundSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSyncService.swift; sourceTree = "<group>"; };
 		D370141F468BA00615662572 /* HealthSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthSyncApp.swift; sourceTree = "<group>"; };
+		D92CE2F934402A2792EA2996 /* HealthSyncTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = HealthSyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA1F30BE3523F66F79699862 /* HealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDataView.swift; sourceTree = "<group>"; };
 		ED6D23011F987B4AFB7CDACD /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		F040879BF50CADE1FE9031E9 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -64,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				1D343810F4B4383E36DAE2F1 /* HealthSync.app */,
+				D92CE2F934402A2792EA2996 /* HealthSyncTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -81,11 +97,21 @@
 			path = HealthSync;
 			sourceTree = "<group>";
 		};
+		21E9F08B3FE2E2019A2BA40A /* HealthSyncTests */ = {
+			isa = PBXGroup;
+			children = (
+				7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */,
+				9CDCB7EEA245A7ECCA075654 /* SyncServiceTests.swift */,
+			);
+			path = HealthSyncTests;
+			sourceTree = "<group>";
+		};
 		28FBFFD0D3C692B467C9E997 = {
 			isa = PBXGroup;
 			children = (
 				F0B6FE205772ACFD89B3499D /* Config */,
 				1618E30B30C691EB111703F1 /* HealthSync */,
+				21E9F08B3FE2E2019A2BA40A /* HealthSyncTests */,
 				FCC1EB1E438401B4D686DCCF /* Frameworks */,
 				04FE962AFCDCE2EB2C2661AA /* Products */,
 			);
@@ -188,6 +214,24 @@
 			productReference = 1D343810F4B4383E36DAE2F1 /* HealthSync.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C1173EDFF164D1536C2E6B9F /* HealthSyncTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F42DB56C5696F224FEA62834 /* Build configuration list for PBXNativeTarget "HealthSyncTests" */;
+			buildPhases = (
+				58E5BE51E7D5505FF1586510 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5CFB6056745426D664D3D23 /* PBXTargetDependency */,
+			);
+			name = HealthSyncTests;
+			packageProductDependencies = (
+			);
+			productName = HealthSyncTests;
+			productReference = D92CE2F934402A2792EA2996 /* HealthSyncTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -198,6 +242,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					892A921C4AE312FBC7AB053B = {
+						DevelopmentTeam = "";
+					};
+					C1173EDFF164D1536C2E6B9F = {
 						DevelopmentTeam = "";
 					};
 				};
@@ -217,6 +264,7 @@
 			projectRoot = "";
 			targets = (
 				892A921C4AE312FBC7AB053B /* HealthSync */,
+				C1173EDFF164D1536C2E6B9F /* HealthSyncTests */,
 			);
 		};
 /* End PBXProject section */
@@ -233,6 +281,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		58E5BE51E7D5505FF1586510 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */,
+				145E3C602F2A800DB3F475EE /* SyncServiceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		810254FFA098B3E2D484392A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +313,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		F5CFB6056745426D664D3D23 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 892A921C4AE312FBC7AB053B /* HealthSync */;
+			targetProxy = D7F19F04B9DC311F118284C7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		5E7BEC9CDF6A3187C96D8D09 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -273,6 +338,23 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.HealthSync;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		6756B9C7030618D0363F6278 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.HealthSyncTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthSync.app/HealthSync";
 			};
 			name = Release;
 		};
@@ -358,6 +440,23 @@
 			};
 			name = Debug;
 		};
+		A7709086B32B06B17F4F550E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.HealthSyncTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HealthSync.app/HealthSync";
+			};
+			name = Debug;
+		};
 		C11839D830848BE4CE40A20B /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F040879BF50CADE1FE9031E9 /* Release.xcconfig */;
@@ -435,6 +534,15 @@
 			buildConfigurations = (
 				917D6698AB977A73A9885894 /* Debug */,
 				5E7BEC9CDF6A3187C96D8D09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F42DB56C5696F224FEA62834 /* Build configuration list for PBXNativeTarget "HealthSyncTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A7709086B32B06B17F4F550E /* Debug */,
+				6756B9C7030618D0363F6278 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

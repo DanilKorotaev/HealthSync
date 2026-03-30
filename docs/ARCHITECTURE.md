@@ -26,4 +26,10 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 - **SyncService** — orchestration, JSON encoding, conflict policy.
 - **BackgroundSyncService** — `URLSession` background configuration and completion handlers.
 
+## Architecture constraints (mandatory)
+
+- Services must expose protocols (`*Protocol`) and be injected as dependencies.
+- Business logic must remain isolated from concrete frameworks where possible.
+- New logic must be covered by tests (unit first, integration where meaningful).
+
 See the implementation plan in the knowledge base for JSON schemas and folder layout.

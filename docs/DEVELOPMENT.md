@@ -23,6 +23,18 @@ Commit both `project.yml` and `HealthSync.xcodeproj` so clones build without Xco
 xcodebuild -scheme HealthSync -destination 'generic/platform=iOS Simulator' build
 ```
 
+## Testing policy (mandatory)
+
+- All new production code must include tests in the same change.
+- Use protocol-driven design to make services testable with mocks/fakes.
+- A change is not considered complete without green tests.
+
+Recommended local command:
+
+```bash
+xcodebuild test -scheme HealthSync -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
 ## Branching
 
 Use short-lived branches and open PRs to `main` once collaboration starts; exact Git flow can mirror the knowledge-base-bot `GIT_FLOW.md` pattern if you add it later.

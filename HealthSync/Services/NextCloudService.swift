@@ -1,7 +1,11 @@
 import Foundation
 
 /// WebDAV / Nextcloud uploads (implementation in a later milestone).
-final class NextCloudService {
+protocol NextCloudServiceProtocol {
+    func validateConfiguration() async throws
+}
+
+final class NextCloudService: NextCloudServiceProtocol {
     init() {}
 
     func validateConfiguration() async throws {

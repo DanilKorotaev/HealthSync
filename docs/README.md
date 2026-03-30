@@ -7,6 +7,7 @@ Welcome to the HealthSync project documentation.
 - [SETUP.md](SETUP.md) — Xcode, signing, environment variables, secrets policy
 - [DEVELOPMENT.md](DEVELOPMENT.md) — daily development workflow and XcodeGen
 - [ARCHITECTURE.md](ARCHITECTURE.md) — folders, services, and data flow (planned)
+- [CODING_STANDARDS.md](CODING_STANDARDS.md) — mandatory engineering standards (protocol-first + tests)
 - [todo.md](todo.md) — active tasks
 - [completed.md](completed.md) — completed tasks
 

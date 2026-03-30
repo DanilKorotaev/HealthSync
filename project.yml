@@ -32,3 +32,13 @@ targets:
       path: HealthSync.entitlements
     info:
       path: HealthSync/Resources/Info.plist
+  HealthSyncTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: HealthSyncTests
+    dependencies:
+      - target: HealthSync
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
