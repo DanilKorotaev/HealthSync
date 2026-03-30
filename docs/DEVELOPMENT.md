@@ -35,6 +35,13 @@ Recommended local command:
 xcodebuild test -scheme HealthSync -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
+## CI quality gates
+
+- CI workflow is defined in `.github/workflows/ci.yml`.
+- Every PR runs tests with `-enableCodeCoverage YES`.
+- Coverage threshold is enforced by `MIN_COVERAGE` (current baseline: `35`).
+- PR template requires explicit confirmation for tests, protocol-first design, and secrets policy.
+
 ## Branching
 
 Use short-lived branches and open PRs to `main` once collaboration starts; exact Git flow can mirror the knowledge-base-bot `GIT_FLOW.md` pattern if you add it later.

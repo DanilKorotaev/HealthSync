@@ -8,8 +8,6 @@ _None._
 
 ### Core
 
-- [ ] [Protocol-first refactor for service layer](tasks/pending/task-tech-protocol-first.md)
-- [ ] [Test infrastructure and coverage baseline](tasks/pending/task-testing-coverage-baseline.md)
 - [ ] [HealthKit read path and permissions](tasks/pending/task-feature-healthkit-read.md)
 - [ ] [Nextcloud WebDAV upload + Keychain credentials](tasks/pending/task-feature-nextcloud-webdav.md)
 - [ ] [Sync orchestration and JSON export](tasks/pending/task-feature-sync-orchestration.md)
