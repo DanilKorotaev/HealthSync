@@ -36,6 +36,30 @@ final class SyncServiceTests: XCTestCase {
         XCTAssertEqual(webhook.calls.count, 1)
     }
 
+    func testSyncNowUsingBackgroundUploadsCompletesSuccessfully() async {
+        let nextcloud = NextCloudServiceMock()
+        let webhook = WebhookMock()
+        let sut = SyncService(
+            healthKit: HealthKitServiceMock(isHealthDataAvailable: true),
+            nextcloud: nextcloud,
+            webhookClient: webhook
+        )
+
+        let exp = expectation(description: "background sync")
+        sut.syncNowUsingBackgroundUploads { result in
+            if case .success = result {
+                exp.fulfill()
+            } else {
+                XCTFail("Expected success, got \(String(describing: result))")
+            }
+        }
+        await fulfillment(of: [exp], timeout: 3.0)
+
+        XCTAssertEqual(nextcloud.validateConfigurationCallCount, 1)
+        XCTAssertEqual(nextcloud.backgroundEnqueueCount, 1)
+        XCTAssertEqual(webhook.calls.count, 1)
+    }
+
     func testSyncNowCallsWebhookWithRelativePaths() async throws {
         let nextcloud = NextCloudServiceMock()
         let webhook = WebhookMock()
@@ -125,6 +149,7 @@ private struct HealthKitServiceMock: HealthKitServiceProtocol {
 private final class NextCloudServiceMock: NextCloudServiceProtocol {
     private(set) var validateConfigurationCallCount = 0
     private(set) var uploads: [(path: String, contentType: String)] = []
+    private(set) var backgroundEnqueueCount = 0
 
     func validateConfiguration() async throws {
         validateConfigurationCallCount += 1
@@ -138,6 +163,17 @@ private final class NextCloudServiceMock: NextCloudServiceProtocol {
 
     func upload(data: Data, remotePath: String, contentType: String) async throws {
         uploads.append((remotePath, contentType))
+    }
+
+    func enqueueSequentialBackgroundUploads(
+        items: [(data: Data, remotePath: String, contentType: String)],
+        onAllFinished: @escaping (Result<Void, Error>) -> Void
+    ) throws {
+        backgroundEnqueueCount += 1
+        XCTAssertEqual(items.count, 2)
+        DispatchQueue.main.async {
+            onAllFinished(.success(()))
+        }
     }
 }
 

@@ -32,7 +32,7 @@ xcodebuild -scheme HealthSync -destination 'generic/platform=iOS Simulator' buil
 Recommended local command:
 
 ```bash
-xcodebuild test -scheme HealthSync -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -scheme HealthSync -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5'
 ```
 
 ## CI quality gates

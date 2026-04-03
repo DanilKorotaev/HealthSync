@@ -1,9 +1,5 @@
 # TODO
 
-## In progress
-
-- [🚧] [Background delivery + background URLSession](tasks/pending/task-feature-background-sync.md)
-
 ## Planned
 
 ### Product / ops

@@ -1,9 +1,11 @@
 import SwiftUI
+import UserNotifications
 
 struct SettingsView: View {
     @State private var baseURL: String = AppConfiguration.string(for: AppConfiguration.Keys.nextcloudBaseURL) ?? ""
     @State private var webDAVRoot: String = AppConfiguration.string(for: AppConfiguration.Keys.nextcloudWebDAVRoot) ?? "remote.php/dav/files"
     @State private var webhookURL: String = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookURL) ?? ""
+    @State private var backgroundSyncNotifications = AppConfiguration.backgroundSyncNotificationsEnabled
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var connectionStatus: String?
@@ -17,6 +19,19 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                Toggle("Notify when background sync finishes", isOn: $backgroundSyncNotifications)
+                    .onChange(of: backgroundSyncNotifications) { _, newValue in
+                        AppConfiguration.setBackgroundSyncNotificationsEnabled(newValue)
+                        if newValue {
+                            Task { await requestNotificationAuthorizationIfNeeded() }
+                        }
+                    }
+            } header: {
+                Text("Notifications")
+            } footer: {
+                Text("Optional. Requires notification permission when enabled.")
+            }
             Section("Connection") {
                 TextField("Nextcloud base URL", text: $baseURL)
                     .textInputAutocapitalization(.never)
@@ -61,6 +76,10 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+    }
+
+    private func requestNotificationAuthorizationIfNeeded() async {
+        _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
     }
 
     @MainActor

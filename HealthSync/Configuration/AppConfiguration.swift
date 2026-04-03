@@ -11,6 +11,18 @@ enum AppConfiguration {
         static let syncWebhookURL = "SYNC_WEBHOOK_URL"
     }
 
+    enum UserSettingsKeys {
+        static let backgroundSyncNotifications = "healthsync.settings.background_sync_notifications"
+    }
+
+    static var backgroundSyncNotificationsEnabled: Bool {
+        UserDefaults.standard.bool(forKey: UserSettingsKeys.backgroundSyncNotifications)
+    }
+
+    static func setBackgroundSyncNotificationsEnabled(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: UserSettingsKeys.backgroundSyncNotifications)
+    }
+
     static func string(for key: String) -> String? {
         let name = environmentPrefix + key
         let value = ProcessInfo.processInfo.environment[name]?.trimmingCharacters(in: .whitespacesAndNewlines)

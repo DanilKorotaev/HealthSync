@@ -5,6 +5,11 @@ protocol NextCloudServiceProtocol {
     func saveCredentials(username: String, password: String) throws
     func loadCredentials() throws -> NextCloudCredentials?
     func upload(data: Data, remotePath: String, contentType: String) async throws
+    /// Sequential PUTs on a background session; completion runs when all succeed or any fails.
+    func enqueueSequentialBackgroundUploads(
+        items: [(data: Data, remotePath: String, contentType: String)],
+        onAllFinished: @escaping (Result<Void, Error>) -> Void
+    ) throws
 }
 
 struct NextCloudCredentials: Codable, Equatable {
@@ -27,6 +32,7 @@ enum NextCloudServiceError: Error, Equatable {
     case missingCredentials
     case invalidHTTPResponse
     case server(statusCode: Int)
+    case backgroundUploadAlreadyInProgress
 }
 
 protocol CredentialsStoreProtocol {
@@ -149,6 +155,25 @@ final class NextCloudService: NextCloudServiceProtocol {
             }
         }
         throw lastError ?? NextCloudServiceError.invalidHTTPResponse
+    }
+
+    func enqueueSequentialBackgroundUploads(
+        items: [(data: Data, remotePath: String, contentType: String)],
+        onAllFinished: @escaping (Result<Void, Error>) -> Void
+    ) throws {
+        let config = try configuration()
+        let credentials = try credentials()
+        let auth = credentials.basicAuthorizationHeader
+        let mapped: [(url: URL, body: Data, contentType: String)] = items.map { item in
+            let cleanedPath = item.remotePath.hasPrefix("/") ? String(item.remotePath.dropFirst()) : item.remotePath
+            let url = config.webDAVURL.appending(path: cleanedPath)
+            return (url, item.data, item.contentType)
+        }
+        BackgroundWebDAVSession.shared.enqueueSequentialPUTs(
+            authorizationHeader: auth,
+            items: mapped,
+            completion: onAllFinished
+        )
     }
 
     private func configuration() throws -> NextCloudConfiguration {

@@ -2,6 +2,23 @@ import XCTest
 @testable import HealthSync
 
 final class AppConfigurationTests: XCTestCase {
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: AppConfiguration.UserSettingsKeys.backgroundSyncNotifications)
+        super.tearDown()
+    }
+
+    func testBackgroundSyncNotificationsDefaultFalseWhenUnset() {
+        UserDefaults.standard.removeObject(forKey: AppConfiguration.UserSettingsKeys.backgroundSyncNotifications)
+        XCTAssertFalse(AppConfiguration.backgroundSyncNotificationsEnabled)
+    }
+
+    func testSetBackgroundSyncNotificationsPersists() {
+        AppConfiguration.setBackgroundSyncNotificationsEnabled(true)
+        XCTAssertTrue(AppConfiguration.backgroundSyncNotificationsEnabled)
+        AppConfiguration.setBackgroundSyncNotificationsEnabled(false)
+        XCTAssertFalse(AppConfiguration.backgroundSyncNotificationsEnabled)
+    }
+
     func testSetUserStringAndReadBack() {
         let key = "TEST_KEY_\(UUID().uuidString)"
         AppConfiguration.setUserString(" https://example.local ", for: key)

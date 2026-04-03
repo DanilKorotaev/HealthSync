@@ -13,6 +13,7 @@ protocol HealthKitServiceProtocol {
 
 enum HealthKitServiceError: Error, Equatable {
     case healthDataUnavailable
+    case backgroundDeliveryEnableFailed
 }
 
 struct DailyAggregationInput: Equatable {
@@ -55,8 +56,19 @@ protocol HealthStoreProtocol {
     func requestAuthorization(toShare typesToShare: Set<HKSampleType>?, read typesToRead: Set<HKObjectType>?) async throws
 }
 
-final class HealthStoreAdapter: HealthStoreProtocol {
+/// HealthKit APIs needed for background delivery and observer queries (same `HKHealthStore` as reads).
+protocol HKBackgroundCapableHealthStore: AnyObject, HealthStoreProtocol {
+    func enableBackgroundDelivery(for objectType: HKObjectType, frequency: HKUpdateFrequency) async throws
+    func execute(query: HKQuery)
+    func stop(query: HKQuery)
+}
+
+final class HealthStoreAdapter: HKBackgroundCapableHealthStore {
+    static let shared = HealthStoreAdapter()
+
     private let healthStore = HKHealthStore()
+
+    private init() {}
 
     var isHealthDataAvailable: Bool {
         HKHealthStore.isHealthDataAvailable()
@@ -73,13 +85,35 @@ final class HealthStoreAdapter: HealthStoreProtocol {
             }
         }
     }
+
+    func enableBackgroundDelivery(for objectType: HKObjectType, frequency: HKUpdateFrequency) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            healthStore.enableBackgroundDelivery(for: objectType, frequency: frequency) { success, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else if success {
+                    continuation.resume(returning: ())
+                } else {
+                    continuation.resume(throwing: HealthKitServiceError.backgroundDeliveryEnableFailed)
+                }
+            }
+        }
+    }
+
+    func execute(query: HKQuery) {
+        healthStore.execute(query)
+    }
+
+    func stop(query: HKQuery) {
+        healthStore.stop(query)
+    }
 }
 
 /// Reads samples from HealthKit and manages authorization.
 final class HealthKitService: HealthKitServiceProtocol {
     private let healthStore: HealthStoreProtocol
 
-    init(healthStore: HealthStoreProtocol = HealthStoreAdapter()) {
+    init(healthStore: HealthStoreProtocol = HealthStoreAdapter.shared) {
         self.healthStore = healthStore
     }
 
