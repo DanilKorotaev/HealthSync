@@ -42,6 +42,38 @@ final class NextCloudServiceTests: XCTestCase {
         XCTAssertEqual(client.requests.first?.httpMethod, "PUT")
     }
 
+    func testDownloadReturnsNilFor404() async throws {
+        let client = HTTPClientMock(getStatusCode: 404, getData: Data())
+        let sut = NextCloudService(
+            credentialsStore: CredentialsStoreMock(credentials: .init(username: "u", password: "p")),
+            httpClient: client,
+            sleeper: SleeperMock(),
+            configurationProvider: {
+                .init(baseURL: URL(string: "https://cloud.example.com")!, webDAVRoot: "remote.php/dav/files")
+            }
+        )
+
+        let data = try await sut.download(remotePath: "HealthData/sync_state.json")
+        XCTAssertNil(data)
+        XCTAssertEqual(client.requests.last?.httpMethod, "GET")
+    }
+
+    func testDownloadReturnsBodyFor200() async throws {
+        let payload = Data("{\"x\":1}".utf8)
+        let client = HTTPClientMock(getStatusCode: 200, getData: payload)
+        let sut = NextCloudService(
+            credentialsStore: CredentialsStoreMock(credentials: .init(username: "u", password: "p")),
+            httpClient: client,
+            sleeper: SleeperMock(),
+            configurationProvider: {
+                .init(baseURL: URL(string: "https://cloud.example.com")!, webDAVRoot: "remote.php/dav/files")
+            }
+        )
+
+        let data = try await sut.download(remotePath: "HealthData/sync_state.json")
+        XCTAssertEqual(data, payload)
+    }
+
     func testSaveAndLoadCredentialsUsesStore() throws {
         let store = CredentialsStoreMock()
         let sut = NextCloudService(
@@ -76,13 +108,21 @@ private final class CredentialsStoreMock: CredentialsStoreProtocol {
 private final class HTTPClientMock: WebDAVHTTPClientProtocol {
     private(set) var requests: [URLRequest] = []
     private var statusCodes: [Int]
+    private var getStatusCode: Int?
+    private var getData: Data
 
-    init(statusCodes: [Int] = [207]) {
+    init(statusCodes: [Int] = [207], getStatusCode: Int? = nil, getData: Data = Data()) {
         self.statusCodes = statusCodes
+        self.getStatusCode = getStatusCode
+        self.getData = getData
     }
 
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         requests.append(request)
+        if request.httpMethod == "GET", let code = getStatusCode {
+            let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: nil, headerFields: nil)!
+            return (getData, response)
+        }
         let code = statusCodes.isEmpty ? 207 : statusCodes.removeFirst()
         let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: nil, headerFields: nil)!
         return (Data(), response)

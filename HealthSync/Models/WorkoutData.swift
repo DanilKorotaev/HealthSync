@@ -2,6 +2,8 @@ import Foundation
 
 /// Workout export shape (see project documentation for full JSON schema).
 struct WorkoutData: Codable, Equatable {
+    /// Stable HealthKit workout UUID (for filenames and server-side linking).
+    var sourceIdentifier: String?
     var date: String
     var workoutType: String
     var workoutTypeDisplay: String
@@ -17,6 +19,7 @@ struct WorkoutData: Codable, Equatable {
     var syncedAt: String?
 
     enum CodingKeys: String, CodingKey {
+        case sourceIdentifier = "source_id"
         case date
         case workoutType = "workout_type"
         case workoutTypeDisplay = "workout_type_display"

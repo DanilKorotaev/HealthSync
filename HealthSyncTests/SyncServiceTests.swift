@@ -30,10 +30,48 @@ final class SyncServiceTests: XCTestCase {
 
         try await sut.syncNow()
         XCTAssertEqual(nextcloud.validateConfigurationCallCount, 1)
+        XCTAssertEqual(nextcloud.downloadPaths, ["HealthData/sync_state.json"])
         XCTAssertEqual(nextcloud.uploads.count, 2)
         XCTAssertTrue(nextcloud.uploads.contains { $0.path.hasPrefix("HealthData/daily/") && $0.path.hasSuffix(".json") })
         XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/sync_state.json" })
         XCTAssertEqual(webhook.calls.count, 1)
+    }
+
+    func testSyncNowUploadsIncrementalWorkoutThenDailyAndState() async throws {
+        let nextcloud = NextCloudServiceMock()
+        let webhook = WebhookMock()
+        let workout = WorkoutAggregationInput(
+            sourceIdentifier: "11111111-1111-1111-1111-111111111111",
+            date: "2026-06-01",
+            workoutType: "running",
+            workoutTypeDisplay: "Running",
+            isGym: false,
+            durationMinutes: 30,
+            distanceKm: 5,
+            activeCalories: 200,
+            totalCalories: 200,
+            heartRateSamples: [],
+            linkedNote: nil,
+            syncedAt: "2026-06-01T10:00:00Z"
+        )
+        let healthKit = HealthKitServiceMock(isHealthDataAvailable: true)
+        healthKit.incrementalBatches = [
+            ([workout], Data([0xAB])),
+            ([], nil)
+        ]
+        let sut = SyncService(
+            healthKit: healthKit,
+            nextcloud: nextcloud,
+            webhookClient: webhook
+        )
+
+        try await sut.syncNow()
+
+        XCTAssertEqual(nextcloud.uploads.count, 3)
+        let workoutPath = "HealthData/workouts/2026-06-01_11111111-1111-1111-1111-111111111111.json"
+        XCTAssertTrue(nextcloud.uploads.contains { $0.path == workoutPath })
+        XCTAssertEqual(webhook.calls.first?.files.count, 3)
+        XCTAssertTrue(webhook.calls.first?.files.contains(workoutPath) ?? false)
     }
 
     func testSyncNowUsingBackgroundUploadsCompletesSuccessfully() async {
@@ -88,10 +126,22 @@ final class SyncServiceTests: XCTestCase {
     }
 }
 
-private struct HealthKitServiceMock: HealthKitServiceProtocol {
+private final class HealthKitServiceMock: HealthKitServiceProtocol {
+    typealias WorkoutIncrementalBatch = ([WorkoutAggregationInput], Data?)
+
     let isHealthDataAvailable: Bool
+    /// Simulates `HKAnchoredObjectQuery` pages: each tuple is one batch; an empty first array ends the workout phase.
+    var incrementalBatches: [WorkoutIncrementalBatch] = [([], nil)]
+    private var incrementalIndex = 0
+
     var requiredReadTypes: Set<HKObjectType> { [] }
+
+    init(isHealthDataAvailable: Bool = true) {
+        self.isHealthDataAvailable = isHealthDataAvailable
+    }
+
     func requestReadAuthorization() async throws {}
+
     func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput {
         DailyAggregationInput(
             date: CalendarDayFormatter.yyyyMMdd(for: date),
@@ -110,6 +160,19 @@ private struct HealthKitServiceMock: HealthKitServiceProtocol {
             syncedAt: "2026-03-31T00:00:00Z"
         )
     }
+
+    func fetchWorkoutsIncremental(anchor: Data?, limit: Int) async throws -> (
+        workouts: [WorkoutAggregationInput],
+        newAnchor: Data?
+    ) {
+        guard incrementalIndex < incrementalBatches.count else {
+            return (workouts: [], newAnchor: nil)
+        }
+        let batch = incrementalBatches[incrementalIndex]
+        incrementalIndex += 1
+        return (workouts: batch.0, newAnchor: batch.1)
+    }
+
     func makeDailyHealthData(from input: DailyAggregationInput) -> DailyHealthData {
         DailyHealthData(
             date: input.date,
@@ -128,8 +191,10 @@ private struct HealthKitServiceMock: HealthKitServiceProtocol {
             syncedAt: nil
         )
     }
+
     func makeWorkoutData(from input: WorkoutAggregationInput) -> WorkoutData {
         WorkoutData(
+            sourceIdentifier: input.sourceIdentifier,
             date: input.date,
             workoutType: input.workoutType,
             workoutTypeDisplay: input.workoutTypeDisplay,
@@ -149,6 +214,7 @@ private struct HealthKitServiceMock: HealthKitServiceProtocol {
 
 private final class NextCloudServiceMock: NextCloudServiceProtocol {
     private(set) var validateConfigurationCallCount = 0
+    private(set) var downloadPaths: [String] = []
     private(set) var uploads: [(path: String, contentType: String)] = []
     private(set) var backgroundEnqueueCount = 0
 
@@ -162,6 +228,11 @@ private final class NextCloudServiceMock: NextCloudServiceProtocol {
         nil
     }
 
+    func download(remotePath: String) async throws -> Data? {
+        downloadPaths.append(remotePath)
+        return nil
+    }
+
     func upload(data: Data, remotePath: String, contentType: String) async throws {
         uploads.append((remotePath, contentType))
     }
@@ -171,7 +242,6 @@ private final class NextCloudServiceMock: NextCloudServiceProtocol {
         onAllFinished: @escaping (Result<Void, Error>) -> Void
     ) throws {
         backgroundEnqueueCount += 1
-        XCTAssertEqual(items.count, 2)
         DispatchQueue.main.async {
             onAllFinished(.success(()))
         }

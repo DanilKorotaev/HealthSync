@@ -10,3 +10,4 @@
 | [Sync orchestration and JSON export](tasks/completed/task-feature-sync-orchestration.md) | 2026-03-31 |
 | [Background delivery + background URLSession](tasks/completed/task-feature-background-sync.md) | 2026-03-31 |
 | [HealthKit real daily metrics](tasks/completed/task-feature-healthkit-daily-metrics.md) | 2026-03-31 |
+| [Incremental sync — workouts](tasks/completed/task-feature-sync-incremental-workouts.md) | 2026-03-31 |

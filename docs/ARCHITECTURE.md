@@ -18,7 +18,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 | `HealthKitService` | Read types + auth + **real daily `HKStatistics` / samples** for the local calendar day + workout mappers |
 | `HealthStoreAdapter.shared` | Single `HKHealthStore` for reads + background delivery + observer queries |
 | `NextCloudService` | Keychain credentials + PROPFIND validation + foreground PUT retry/backoff + background enqueue |
-| `SyncService` | `syncNow()` (foreground uploads) + `syncNowUsingBackgroundUploads` (observer path) + optional webhook |
+| `SyncService` | `syncNow()` / background: **incremental workouts** (`HKAnchoredObjectQuery` + anchor in `sync_state`) → daily JSON → `sync_state` + optional webhook |
 | `BackgroundWebDAVSession` | Background `URLSession` sequential PUT chain + `urlSessionDidFinishEvents` |
 | `HealthKitBackgroundObserverRegistrar` | `enableBackgroundDelivery` + `HKObserverQuery` per sample type |
 | `BackgroundSyncCoordinator` | Starts observers at launch; ties observer → background sync → notifications |
@@ -27,7 +27,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 
 ## Planned modules
 
-- **HealthKitService** — `HKAnchoredObjectQuery` / incremental sync and historical backfill (next milestone).
+- **HealthKitService** — anchored **workout** batches; incremental quantity/sleep samples (next milestone).
 - **NextCloudService** — optional upload queue / conflict policy refinements.
 - **SyncService** — historical backfill and conflict policy.
 

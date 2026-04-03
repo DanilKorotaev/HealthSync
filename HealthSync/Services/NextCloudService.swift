@@ -4,6 +4,8 @@ protocol NextCloudServiceProtocol {
     func validateConfiguration() async throws
     func saveCredentials(username: String, password: String) throws
     func loadCredentials() throws -> NextCloudCredentials?
+    /// GET file body; returns `nil` if the resource does not exist (HTTP 404).
+    func download(remotePath: String) async throws -> Data?
     func upload(data: Data, remotePath: String, contentType: String) async throws
     /// Sequential PUTs on a background session; completion runs when all succeed or any fails.
     func enqueueSequentialBackgroundUploads(
@@ -120,6 +122,26 @@ final class NextCloudService: NextCloudServiceProtocol {
 
     func loadCredentials() throws -> NextCloudCredentials? {
         try credentialsStore.load(service: Self.keychainService, account: Self.keychainAccount)
+    }
+
+    func download(remotePath: String) async throws -> Data? {
+        let config = try configuration()
+        let credentials = try credentials()
+        let cleanedPath = remotePath.hasPrefix("/") ? String(remotePath.dropFirst()) : remotePath
+        let destinationURL = config.webDAVURL.appending(path: cleanedPath)
+
+        var request = URLRequest(url: destinationURL)
+        request.httpMethod = "GET"
+        request.setValue(credentials.basicAuthorizationHeader, forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await httpClient.send(request)
+        if response.statusCode == 404 {
+            return nil
+        }
+        guard (200...299).contains(response.statusCode) else {
+            throw NextCloudServiceError.server(statusCode: response.statusCode)
+        }
+        return data
     }
 
     func upload(data: Data, remotePath: String, contentType: String = "application/json") async throws {

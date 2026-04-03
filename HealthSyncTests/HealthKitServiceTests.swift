@@ -127,6 +127,7 @@ final class HealthKitServiceTests: XCTestCase {
     func testMakeWorkoutDataCalculatesHeartRateAndZones() {
         let sut = HealthKitService(healthStore: HealthStoreMock())
         let input = WorkoutAggregationInput(
+            sourceIdentifier: "00000000-0000-0000-0000-000000000001",
             date: "2026-03-30",
             workoutType: "traditional_strength_training",
             workoutTypeDisplay: "Strength",
