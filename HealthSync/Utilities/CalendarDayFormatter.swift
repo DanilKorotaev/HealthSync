@@ -16,6 +16,19 @@ enum CalendarDayFormatter {
         return formatter.string(from: date)
     }
 
+    /// Start of local calendar day for a `yyyy-MM-dd` string (invalid components → `nil`).
+    static func startOfDay(fromYyyyMMdd string: String, calendar: Calendar) -> Date? {
+        let parts = string.split(separator: "-")
+        guard parts.count == 3,
+              let y = Int(parts[0]),
+              let m = Int(parts[1]),
+              let d = Int(parts[2])
+        else {
+            return nil
+        }
+        return calendar.date(from: DateComponents(year: y, month: m, day: d))
+    }
+
     /// Calendar day key for the local day containing `date` (uses `calendar`’s time zone).
     static func yyyyMMddLocalDay(containing date: Date, calendar: Calendar) -> String {
         let start = calendar.startOfDay(for: date)

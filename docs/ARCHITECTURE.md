@@ -18,7 +18,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 | `HealthKitService` | Read types + auth + **real daily `HKStatistics` / samples** for the local calendar day + workout mappers |
 | `HealthStoreAdapter.shared` | Single `HKHealthStore` for reads + background delivery + observer queries |
 | `NextCloudService` | Keychain credentials + PROPFIND validation + foreground PUT retry/backoff + background enqueue |
-| `SyncService` | `syncNow()` / background: **incremental workouts** (`HKAnchoredObjectQuery` + anchor in `sync_state`) → daily JSON → `sync_state` + optional webhook |
+| `SyncService` | `syncNow()` / background: **incremental workouts** (`HKAnchoredObjectQuery` + anchor in `sync_state`) → **today’s** daily JSON → **historical daily backfill** (batched older calendar days, cursor `daily_backfill_oldest_completed` in `sync_state`) → `sync_state` + optional webhook |
 | `BackgroundWebDAVSession` | Background `URLSession` sequential PUT chain + `urlSessionDidFinishEvents` |
 | `HealthKitBackgroundObserverRegistrar` | `enableBackgroundDelivery` + `HKObserverQuery` per sample type |
 | `BackgroundSyncCoordinator` | Starts observers at launch; ties observer → background sync → notifications |
@@ -27,9 +27,13 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 
 ## Planned modules
 
-- **HealthKitService** — anchored **workout** batches; incremental quantity/sleep samples (next milestone).
+- **HealthKitService** — anchored **workout** batches (done); quantity/sleep remain **daily aggregates** (no per-type anchored backfill).
 - **NextCloudService** — optional upload queue / conflict policy refinements.
-- **SyncService** — historical backfill and conflict policy.
+- **SyncService** — optional tuning of daily backfill (`dailyBackfillBatchSize`, max age); conflict policy if needed.
+
+## Daily backfill (non-workout history)
+
+Workouts use `HKAnchoredObjectQuery`. For steps, energy, sleep summaries, and related **daily** JSON, history is filled by uploading one file per **calendar day**, walking backward from “day before the oldest completed backfill day” (or **yesterday** on first run), up to `dailyBackfillBatchSize` days per sync (default **7**; set **0** to disable). Stops when the cursor would go older than `dailyBackfillMaxAgeDays` (default **730**). The earliest day successfully written is stored in `sync_state.json` as `daily_backfill_oldest_completed` (`yyyy-MM-dd`).
 
 ## Architecture constraints (mandatory)
 

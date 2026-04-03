@@ -6,7 +6,8 @@ final class SyncServiceTests: XCTestCase {
     func testSyncNowThrowsWhenHealthDataUnavailable() async {
         let sut = SyncService(
             healthKit: HealthKitServiceMock(isHealthDataAvailable: false),
-            nextcloud: NextCloudServiceMock()
+            nextcloud: NextCloudServiceMock(),
+            dailyBackfillBatchSize: 0
         )
 
         do {
@@ -25,7 +26,8 @@ final class SyncServiceTests: XCTestCase {
         let sut = SyncService(
             healthKit: HealthKitServiceMock(isHealthDataAvailable: true),
             nextcloud: nextcloud,
-            webhookClient: webhook
+            webhookClient: webhook,
+            dailyBackfillBatchSize: 0
         )
 
         try await sut.syncNow()
@@ -62,7 +64,8 @@ final class SyncServiceTests: XCTestCase {
         let sut = SyncService(
             healthKit: healthKit,
             nextcloud: nextcloud,
-            webhookClient: webhook
+            webhookClient: webhook,
+            dailyBackfillBatchSize: 0
         )
 
         try await sut.syncNow()
@@ -80,7 +83,8 @@ final class SyncServiceTests: XCTestCase {
         let sut = SyncService(
             healthKit: HealthKitServiceMock(isHealthDataAvailable: true),
             nextcloud: nextcloud,
-            webhookClient: webhook
+            webhookClient: webhook,
+            dailyBackfillBatchSize: 0
         )
 
         let exp = expectation(description: "background sync")
@@ -112,7 +116,8 @@ final class SyncServiceTests: XCTestCase {
             healthKit: HealthKitServiceMock(isHealthDataAvailable: true),
             nextcloud: nextcloud,
             webhookClient: webhook,
-            clock: { fixedDate }
+            clock: { fixedDate },
+            dailyBackfillBatchSize: 0
         )
 
         try await sut.syncNow()
@@ -124,6 +129,38 @@ final class SyncServiceTests: XCTestCase {
             ["HealthData/daily/2026-06-01.json", "HealthData/sync_state.json"]
         )
     }
+
+    func testDailyBackfillUploadsOlderDays() async throws {
+        let nextcloud = NextCloudServiceMock()
+        let webhook = WebhookMock()
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        let fixedDate = try XCTUnwrap(formatter.date(from: "2026-06-15T12:00:00Z"))
+
+        let healthKit = HealthKitServiceMock(isHealthDataAvailable: true)
+        healthKit.calendarForDaily = utc
+
+        let sut = SyncService(
+            healthKit: healthKit,
+            nextcloud: nextcloud,
+            webhookClient: webhook,
+            clock: { fixedDate },
+            calendar: utc,
+            dailyBackfillMaxAgeDays: 400,
+            dailyBackfillBatchSize: 2
+        )
+
+        try await sut.syncNow()
+
+        XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/daily/2026-06-15.json" })
+        XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/daily/2026-06-14.json" })
+        XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/daily/2026-06-13.json" })
+        XCTAssertEqual(nextcloud.uploads.count, 4)
+        XCTAssertEqual(webhook.calls.first?.files.count, 4)
+    }
 }
 
 private final class HealthKitServiceMock: HealthKitServiceProtocol {
@@ -133,6 +170,8 @@ private final class HealthKitServiceMock: HealthKitServiceProtocol {
     /// Simulates `HKAnchoredObjectQuery` pages: each tuple is one batch; an empty first array ends the workout phase.
     var incrementalBatches: [WorkoutIncrementalBatch] = [([], nil)]
     private var incrementalIndex = 0
+    /// When set, daily export keys use this calendar (for backfill tests); otherwise UTC `yyyyMMdd`.
+    var calendarForDaily: Calendar?
 
     var requiredReadTypes: Set<HKObjectType> { [] }
 
@@ -143,8 +182,14 @@ private final class HealthKitServiceMock: HealthKitServiceProtocol {
     func requestReadAuthorization() async throws {}
 
     func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput {
-        DailyAggregationInput(
-            date: CalendarDayFormatter.yyyyMMdd(for: date),
+        let dayKey: String
+        if let cal = calendarForDaily {
+            dayKey = CalendarDayFormatter.yyyyMMddLocalDay(containing: date, calendar: cal)
+        } else {
+            dayKey = CalendarDayFormatter.yyyyMMdd(for: date)
+        }
+        return DailyAggregationInput(
+            date: dayKey,
             steps: 0,
             distanceKm: 0,
             activeCalories: 0,

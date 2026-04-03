@@ -20,6 +20,11 @@ final class SyncService: SyncServiceProtocol {
     private let clock: () -> Date
     private let jsonEncoder: () -> JSONEncoder
     private let jsonDecoder: () -> JSONDecoder
+    private let calendar: Calendar
+    /// How far back (in calendar days from today) daily JSON backfill may run.
+    private let dailyBackfillMaxAgeDays: Int
+    /// How many past `HealthData/daily/*.json` files to upload per sync; `0` disables backfill.
+    private let dailyBackfillBatchSize: Int
 
     private static let syncStatePath = "HealthData/sync_state.json"
     private static let workoutBatchLimit = 50
@@ -35,7 +40,10 @@ final class SyncService: SyncServiceProtocol {
             encoder.dateEncodingStrategy = .iso8601
             return encoder
         },
-        jsonDecoder: @escaping () -> JSONDecoder = { JSONDecoder() }
+        jsonDecoder: @escaping () -> JSONDecoder = { JSONDecoder() },
+        calendar: Calendar = .current,
+        dailyBackfillMaxAgeDays: Int = 730,
+        dailyBackfillBatchSize: Int = 7
     ) {
         self.healthKit = healthKit
         self.nextcloud = nextcloud
@@ -43,6 +51,9 @@ final class SyncService: SyncServiceProtocol {
         self.clock = clock
         self.jsonEncoder = jsonEncoder
         self.jsonDecoder = jsonDecoder
+        self.calendar = calendar
+        self.dailyBackfillMaxAgeDays = dailyBackfillMaxAgeDays
+        self.dailyBackfillBatchSize = dailyBackfillBatchSize
     }
 
     func syncNow() async throws {
@@ -89,16 +100,34 @@ final class SyncService: SyncServiceProtocol {
         let dailyPath = "HealthData/daily/\(dayKey).json"
         try await nextcloud.upload(data: dailyData, remotePath: dailyPath, contentType: "application/json")
 
+        var dailyBackfillOldest = remoteState?.dailyBackfillOldestCompleted
+        var backfillPaths: [String] = []
+        if dailyBackfillBatchSize > 0 {
+            let result = try await dailyBackfillEntries(
+                now: now,
+                encoder: encoder,
+                remoteState: remoteState,
+                startingMergedOldest: dailyBackfillOldest
+            )
+            backfillPaths = result.paths
+            for payload in result.payloads {
+                try await nextcloud.upload(data: payload.data, remotePath: payload.path, contentType: "application/json")
+            }
+            dailyBackfillOldest = result.mergedOldestCompleted
+        }
+
         let state = SyncState(
             lastSyncedAt: CalendarDayFormatter.iso8601UTCSeconds(from: now),
             lastDailyExportDate: dayKey,
             workoutQueryAnchor: workoutAnchorBase64,
+            dailyBackfillOldestCompleted: dailyBackfillOldest,
             notes: remoteState?.notes
         )
         let stateData = try encoder.encode(state)
         try await nextcloud.upload(data: stateData, remotePath: Self.syncStatePath, contentType: "application/json")
 
         var webhookFiles = workoutPaths
+        webhookFiles.append(contentsOf: backfillPaths)
         webhookFiles.append(dailyPath)
         webhookFiles.append(Self.syncStatePath)
         try await webhookClient.postSyncCompleteIfConfigured(date: dayKey, files: webhookFiles)
@@ -152,10 +181,27 @@ final class SyncService: SyncServiceProtocol {
                 let dailyPath = "HealthData/daily/\(dayKey).json"
                 items.append((dailyData, dailyPath, "application/json"))
 
+                var dailyBackfillOldest = remoteState?.dailyBackfillOldestCompleted
+                var backfillPaths: [String] = []
+                if dailyBackfillBatchSize > 0 {
+                    let result = try await dailyBackfillEntries(
+                        now: now,
+                        encoder: encoder,
+                        remoteState: remoteState,
+                        startingMergedOldest: dailyBackfillOldest
+                    )
+                    backfillPaths = result.paths
+                    dailyBackfillOldest = result.mergedOldestCompleted
+                    for payload in result.payloads {
+                        items.append((payload.data, payload.path, "application/json"))
+                    }
+                }
+
                 let state = SyncState(
                     lastSyncedAt: CalendarDayFormatter.iso8601UTCSeconds(from: now),
                     lastDailyExportDate: dayKey,
                     workoutQueryAnchor: workoutAnchorBase64,
+                    dailyBackfillOldestCompleted: dailyBackfillOldest,
                     notes: remoteState?.notes
                 )
                 let stateData = try encoder.encode(state)
@@ -169,6 +215,7 @@ final class SyncService: SyncServiceProtocol {
                                 switch uploadResult {
                                 case .success:
                                     var webhookFiles = workoutPaths
+                                    webhookFiles.append(contentsOf: backfillPaths)
                                     webhookFiles.append(dailyPath)
                                     webhookFiles.append(Self.syncStatePath)
                                     try await self.webhookClient.postSyncCompleteIfConfigured(
@@ -189,6 +236,59 @@ final class SyncService: SyncServiceProtocol {
                 completion(.failure(error))
             }
         }
+    }
+
+    private struct DailyBackfillPayload {
+        let data: Data
+        let path: String
+    }
+
+    private func dailyBackfillEntries(
+        now: Date,
+        encoder: JSONEncoder,
+        remoteState: SyncState?,
+        startingMergedOldest: String?
+    ) async throws -> (paths: [String], payloads: [DailyBackfillPayload], mergedOldestCompleted: String?) {
+        let todayStart = calendar.startOfDay(for: now)
+        guard let minDate = calendar.date(byAdding: .day, value: -dailyBackfillMaxAgeDays, to: todayStart),
+              let yesterday = calendar.date(byAdding: .day, value: -1, to: todayStart) else {
+            return ([], [], startingMergedOldest)
+        }
+
+        let startCursor: Date
+        if let oldestStr = remoteState?.dailyBackfillOldestCompleted,
+           let oldestDay = CalendarDayFormatter.startOfDay(fromYyyyMMdd: oldestStr, calendar: calendar) {
+            let oldestStart = calendar.startOfDay(for: oldestDay)
+            startCursor = calendar.date(byAdding: .day, value: -1, to: oldestStart) ?? oldestStart
+        } else {
+            startCursor = calendar.startOfDay(for: yesterday)
+        }
+
+        var cursor = startCursor
+        var paths: [String] = []
+        var payloads: [DailyBackfillPayload] = []
+        var mergedOldest = startingMergedOldest
+        var uploadCount = 0
+
+        while uploadCount < dailyBackfillBatchSize {
+            if cursor < minDate {
+                break
+            }
+            let input = try await healthKit.dailyAggregationInput(for: cursor)
+            let daily = healthKit.makeDailyHealthData(from: input)
+            let data = try encoder.encode(daily)
+            let path = "HealthData/daily/\(input.date).json"
+            paths.append(path)
+            payloads.append(DailyBackfillPayload(data: data, path: path))
+            mergedOldest = [mergedOldest, input.date].compactMap { $0 }.min()
+            uploadCount += 1
+            guard let prev = calendar.date(byAdding: .day, value: -1, to: cursor) else {
+                break
+            }
+            cursor = prev
+        }
+
+        return (paths, payloads, mergedOldest)
     }
 
     private func loadRemoteSyncState(decoder: JSONDecoder) async throws -> SyncState? {

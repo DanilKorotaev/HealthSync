@@ -11,3 +11,4 @@
 | [Background delivery + background URLSession](tasks/completed/task-feature-background-sync.md) | 2026-03-31 |
 | [HealthKit real daily metrics](tasks/completed/task-feature-healthkit-daily-metrics.md) | 2026-03-31 |
 | [Incremental sync — workouts](tasks/completed/task-feature-sync-incremental-workouts.md) | 2026-03-31 |
+| [Daily JSON backfill (historical non-workout days)](tasks/completed/task-feature-sync-daily-backfill.md) | 2026-03-31 |

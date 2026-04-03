@@ -20,4 +20,11 @@ final class CalendarDayFormatterTests: XCTestCase {
         let date = cal.date(from: DateComponents(year: 2026, month: 6, day: 1, hour: 23, minute: 0))!
         XCTAssertEqual(CalendarDayFormatter.yyyyMMddLocalDay(containing: date, calendar: cal), "2026-06-01")
     }
+
+    func testStartOfDayFromYyyyMMddRoundTrip() throws {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        let d = try XCTUnwrap(CalendarDayFormatter.startOfDay(fromYyyyMMdd: "2026-04-10", calendar: cal))
+        XCTAssertEqual(CalendarDayFormatter.yyyyMMddLocalDay(containing: d, calendar: cal), "2026-04-10")
+    }
 }
