@@ -9,6 +9,8 @@ enum AppConfiguration {
         static let nextcloudBaseURL = "NEXTCLOUD_BASE_URL"
         static let nextcloudWebDAVRoot = "NEXTCLOUD_WEBDAV_ROOT"
         static let syncWebhookURL = "SYNC_WEBHOOK_URL"
+        /// Optional Bearer token for `POST` sync webhook (e.g. `health-sync-api`).
+        static let syncWebhookToken = "SYNC_WEBHOOK_TOKEN"
     }
 
     enum UserSettingsKeys {

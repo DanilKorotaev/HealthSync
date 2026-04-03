@@ -39,7 +39,8 @@ xcodegen generate
 |----------|---------|
 | `HEALTHSYNC_NEXTCLOUD_BASE_URL` | HTTPS base URL of the Nextcloud instance (no trailing slash) |
 | `HEALTHSYNC_NEXTCLOUD_WEBDAV_ROOT` | Optional WebDAV path segment (if not using app defaults) |
-| `HEALTHSYNC_SYNC_WEBHOOK_URL` | Optional `POST` endpoint for sync-complete (FastAPI), when implemented |
+| `HEALTHSYNC_SYNC_WEBHOOK_URL` | Optional `POST` endpoint for sync-complete (`health-sync-api` в knowledge-base-bot) |
+| `HEALTHSYNC_SYNC_WEBHOOK_TOKEN` | Optional Bearer token (must match `HEALTH_SYNC_API_TOKEN` on the server) |
 
 Set them in **Product → Scheme → Edit Scheme → Run → Arguments → Environment Variables** for local debugging.
 

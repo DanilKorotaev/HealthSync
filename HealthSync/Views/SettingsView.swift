@@ -5,6 +5,7 @@ struct SettingsView: View {
     @State private var baseURL: String = AppConfiguration.string(for: AppConfiguration.Keys.nextcloudBaseURL) ?? ""
     @State private var webDAVRoot: String = AppConfiguration.string(for: AppConfiguration.Keys.nextcloudWebDAVRoot) ?? "remote.php/dav/files"
     @State private var webhookURL: String = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookURL) ?? ""
+    @State private var webhookToken: String = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookToken) ?? ""
     @State private var backgroundSyncNotifications = AppConfiguration.backgroundSyncNotificationsEnabled
     @State private var username: String = ""
     @State private var password: String = ""
@@ -41,6 +42,8 @@ struct SettingsView: View {
                 TextField("Sync webhook URL (optional)", text: $webhookURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
+                SecureField("Webhook Bearer token (optional)", text: $webhookToken)
+                    .textInputAutocapitalization(.never)
             }
             Section("Credentials") {
                 TextField("Username", text: $username)
@@ -52,6 +55,7 @@ struct SettingsView: View {
                     AppConfiguration.setUserString(baseURL.nilIfEmpty, for: AppConfiguration.Keys.nextcloudBaseURL)
                     AppConfiguration.setUserString(webDAVRoot.nilIfEmpty, for: AppConfiguration.Keys.nextcloudWebDAVRoot)
                     AppConfiguration.setUserString(webhookURL.nilIfEmpty, for: AppConfiguration.Keys.syncWebhookURL)
+                    AppConfiguration.setUserString(webhookToken.nilIfEmpty, for: AppConfiguration.Keys.syncWebhookToken)
                     do {
                         try nextCloudService.saveCredentials(username: username, password: password)
                         connectionStatus = "Credentials saved to Keychain."

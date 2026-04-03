@@ -11,13 +11,19 @@ protocol SyncWebhookClientProtocol {
 
 final class SyncWebhookClient: SyncWebhookClientProtocol {
     private let urlProvider: () -> URL?
+    private let tokenProvider: () -> String?
     private let session: URLSession
 
     init(
         urlProvider: @escaping () -> URL? = { AppConfiguration.url(for: AppConfiguration.Keys.syncWebhookURL) },
+        tokenProvider: @escaping () -> String? = {
+            let s = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookToken) ?? ""
+            return s.isEmpty ? nil : s
+        },
         session: URLSession = .shared
     ) {
         self.urlProvider = urlProvider
+        self.tokenProvider = tokenProvider
         self.session = session
     }
 
@@ -26,6 +32,9 @@ final class SyncWebhookClient: SyncWebhookClientProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let token = tokenProvider() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
         let payload = SyncWebhookPayload(date: date, files: files)
         request.httpBody = try JSONEncoder().encode(payload)
 
