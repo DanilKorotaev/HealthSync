@@ -27,8 +27,10 @@ final class HealthKitServiceTests: XCTestCase {
         }
     }
 
-    func testDailyAggregationInputStubMatchesCalendarDay() async throws {
-        let sut = HealthKitService(healthStore: HealthStoreMock())
+    func testDailyAggregationInputUsesLocalCalendarDayKey() async throws {
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        let sut = HealthKitService(healthStore: HealthStoreMock(), calendar: utc)
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -36,6 +38,25 @@ final class HealthKitServiceTests: XCTestCase {
         let input = try await sut.dailyAggregationInput(for: date)
         XCTAssertEqual(input.date, "2026-04-10")
         XCTAssertNotNil(input.syncedAt)
+    }
+
+    func testDailyAggregationInputThrowsWhenHealthDataUnavailable() async {
+        let sut = HealthKitService(healthStore: HealthStoreMock(isHealthDataAvailable: false))
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        guard let date = formatter.date(from: "2026-04-10T15:00:00Z") else {
+            XCTFail("date")
+            return
+        }
+        do {
+            _ = try await sut.dailyAggregationInput(for: date)
+            XCTFail("Expected healthDataUnavailable")
+        } catch let error as HealthKitServiceError {
+            XCTAssertEqual(error, .healthDataUnavailable)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     func testRequestReadAuthorizationRequestsExpectedTypes() async throws {
@@ -46,6 +67,32 @@ final class HealthKitServiceTests: XCTestCase {
 
         XCTAssertEqual(store.requestAuthorizationCallCount, 1)
         XCTAssertEqual(store.lastRequestedReadTypes, sut.requiredReadTypes)
+    }
+
+    func testMakeDailyHealthDataPrefersHeartRateSummaryOverSamples() {
+        let sut = HealthKitService(healthStore: HealthStoreMock())
+        let input = DailyAggregationInput(
+            date: "2026-03-30",
+            steps: 8000,
+            distanceKm: 6.1,
+            activeCalories: 450,
+            basalCalories: 1600,
+            exerciseMinutes: 70,
+            standHours: 12,
+            restingHeartRate: 58,
+            hrvValues: [40, 50],
+            oxygenSaturationValues: [96, 98],
+            heartRateValues: [40, 200],
+            heartRateSummary: HeartRateStats(min: 60, max: 120, average: 90),
+            sleep: SleepSummary(totalMinutes: 420, deepMinutes: 90, remMinutes: 100, lightMinutes: 180, awakeMinutes: 50),
+            syncedAt: "2026-03-30T10:00:00Z"
+        )
+
+        let result = sut.makeDailyHealthData(from: input)
+
+        XCTAssertEqual(result.heartRate?.min, 60)
+        XCTAssertEqual(result.heartRate?.max, 120)
+        XCTAssertEqual(result.heartRate?.average, 90)
     }
 
     func testMakeDailyHealthDataCalculatesDerivedFields() {
@@ -62,6 +109,7 @@ final class HealthKitServiceTests: XCTestCase {
             hrvValues: [40, 50],
             oxygenSaturationValues: [96, 98],
             heartRateValues: [60, 90, 120],
+            heartRateSummary: nil,
             sleep: SleepSummary(totalMinutes: 420, deepMinutes: 90, remMinutes: 100, lightMinutes: 180, awakeMinutes: 50),
             syncedAt: "2026-03-30T10:00:00Z"
         )
@@ -110,7 +158,7 @@ final class HealthKitServiceTests: XCTestCase {
     }
 }
 
-private final class HealthStoreMock: HealthStoreProtocol {
+private final class HealthStoreMock: HealthStoreProtocol, DailyHealthKitDataProviding {
     private let available: Bool
     private(set) var requestAuthorizationCallCount = 0
     private(set) var lastRequestedReadTypes: Set<HKObjectType>?
@@ -126,5 +174,30 @@ private final class HealthStoreMock: HealthStoreProtocol {
     func requestAuthorization(toShare typesToShare: Set<HKSampleType>?, read typesToRead: Set<HKObjectType>?) async throws {
         requestAuthorizationCallCount += 1
         lastRequestedReadTypes = typesToRead
+    }
+
+    func statistics(
+        for quantityType: HKQuantityType,
+        from start: Date,
+        to end: Date,
+        options: HKStatisticsOptions
+    ) async throws -> HKStatistics? {
+        nil
+    }
+
+    func quantitySamples(
+        for quantityType: HKQuantityType,
+        from start: Date,
+        to end: Date
+    ) async throws -> [HKQuantitySample] {
+        []
+    }
+
+    func categorySamples(
+        for categoryType: HKCategoryType,
+        from start: Date,
+        to end: Date
+    ) async throws -> [HKCategorySample] {
+        []
     }
 }

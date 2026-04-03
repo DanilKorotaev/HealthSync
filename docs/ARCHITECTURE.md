@@ -15,7 +15,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 |------|--------|
 | SwiftUI shell (`MainView`, `SettingsView`) | Main: Sync now + **Sync (background)** + settings (Nextcloud + notification toggle) |
 | `AppConfiguration` | Reads `HEALTHSYNC_*` env and UserDefaults; user toggle for background-sync notifications |
-| `HealthKitService` | Explicit read type set + authorization flow + daily/workout mapper aggregation |
+| `HealthKitService` | Read types + auth + **real daily `HKStatistics` / samples** for the local calendar day + workout mappers |
 | `HealthStoreAdapter.shared` | Single `HKHealthStore` for reads + background delivery + observer queries |
 | `NextCloudService` | Keychain credentials + PROPFIND validation + foreground PUT retry/backoff + background enqueue |
 | `SyncService` | `syncNow()` (foreground uploads) + `syncNowUsingBackgroundUploads` (observer path) + optional webhook |
@@ -27,7 +27,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 
 ## Planned modules
 
-- **HealthKitService** — anchored queries and real aggregates (daily stub remains until then).
+- **HealthKitService** — `HKAnchoredObjectQuery` / incremental sync and historical backfill (next milestone).
 - **NextCloudService** — optional upload queue / conflict policy refinements.
 - **SyncService** — historical backfill and conflict policy.
 

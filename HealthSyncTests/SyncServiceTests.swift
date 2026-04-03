@@ -105,6 +105,7 @@ private struct HealthKitServiceMock: HealthKitServiceProtocol {
             hrvValues: [],
             oxygenSaturationValues: [],
             heartRateValues: [],
+            heartRateSummary: nil,
             sleep: nil,
             syncedAt: "2026-03-31T00:00:00Z"
         )

@@ -5,7 +5,7 @@ protocol HealthKitServiceProtocol {
     var isHealthDataAvailable: Bool { get }
     var requiredReadTypes: Set<HKObjectType> { get }
     func requestReadAuthorization() async throws
-    /// Placeholder until anchored queries are implemented; supplies structured input for export.
+    /// Fetches quantity aggregates, HR/HRV/SpO₂ samples, and sleep segments for the local calendar day containing `date`.
     func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput
     func makeDailyHealthData(from input: DailyAggregationInput) -> DailyHealthData
     func makeWorkoutData(from input: WorkoutAggregationInput) -> WorkoutData
@@ -27,7 +27,9 @@ struct DailyAggregationInput: Equatable {
     var restingHeartRate: Double?
     var hrvValues: [Double]
     var oxygenSaturationValues: [Double]
+    /// Discrete BPM samples for the day (optional); prefer `heartRateSummary` when from HKStatistics.
     var heartRateValues: [Double]
+    var heartRateSummary: HeartRateStats?
     var sleep: SleepSummary?
     var syncedAt: String?
 }
@@ -112,9 +114,17 @@ final class HealthStoreAdapter: HKBackgroundCapableHealthStore {
 /// Reads samples from HealthKit and manages authorization.
 final class HealthKitService: HealthKitServiceProtocol {
     private let healthStore: HealthStoreProtocol
+    private let queryStore: DailyHealthKitDataProviding
+    private let calendar: Calendar
 
-    init(healthStore: HealthStoreProtocol = HealthStoreAdapter.shared) {
+    init(
+        healthStore: HealthStoreProtocol = HealthStoreAdapter.shared,
+        queryStore: DailyHealthKitDataProviding? = nil,
+        calendar: Calendar = .current
+    ) {
         self.healthStore = healthStore
+        self.queryStore = queryStore ?? (healthStore as? DailyHealthKitDataProviding) ?? HealthStoreAdapter.shared
+        self.calendar = calendar
     }
 
     var isHealthDataAvailable: Bool {
@@ -149,28 +159,175 @@ final class HealthKitService: HealthKitServiceProtocol {
     }
 
     func dailyAggregationInput(for date: Date) async throws -> DailyAggregationInput {
-        let day = CalendarDayFormatter.yyyyMMdd(for: date)
+        guard isHealthDataAvailable else {
+            throw HealthKitServiceError.healthDataUnavailable
+        }
+        let dayStart = calendar.startOfDay(for: date)
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
+            throw HealthKitServiceError.healthDataUnavailable
+        }
+        let dayKey = CalendarDayFormatter.yyyyMMddLocalDay(containing: date, calendar: calendar)
         let syncedAt = CalendarDayFormatter.iso8601UTCSeconds(from: Date())
+
+        let steps = Int(
+            try await cumulativeSum(.stepCount, unit: HKUnit.count(), from: dayStart, to: dayEnd).rounded()
+        )
+        let distanceMeters = try await cumulativeSum(
+            .distanceWalkingRunning,
+            unit: HKUnit.meter(),
+            from: dayStart,
+            to: dayEnd
+        )
+        let distanceKm = distanceMeters / 1000.0
+
+        let activeCalories = try await cumulativeSum(
+            .activeEnergyBurned,
+            unit: HKUnit.kilocalorie(),
+            from: dayStart,
+            to: dayEnd
+        )
+        let basalCalories = try await cumulativeSum(
+            .basalEnergyBurned,
+            unit: HKUnit.kilocalorie(),
+            from: dayStart,
+            to: dayEnd
+        )
+        let exerciseMinutes = try await cumulativeSum(
+            .appleExerciseTime,
+            unit: HKUnit.minute(),
+            from: dayStart,
+            to: dayEnd
+        )
+        let standHours = try await cumulativeSum(
+            .appleStandTime,
+            unit: HKUnit.hour(),
+            from: dayStart,
+            to: dayEnd
+        )
+
+        let restingHeartRate = try await discreteAverage(
+            .restingHeartRate,
+            unit: HKUnit.count().unitDivided(by: HKUnit.minute()),
+            from: dayStart,
+            to: dayEnd
+        )
+
+        let hrvValues = try await hrvSampleValues(from: dayStart, to: dayEnd)
+        let oxygenSaturationValues = try await oxygenSamplePercents(from: dayStart, to: dayEnd)
+        let heartRateSummary = try await heartRateStatistics(from: dayStart, to: dayEnd)
+
+        let sleep: SleepSummary?
+        if let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
+            let sleepQueryStart = calendar.date(byAdding: .hour, value: -14, to: dayStart) ?? dayStart
+            let sleepSamples = try await queryStore.categorySamples(
+                for: sleepType,
+                from: sleepQueryStart,
+                to: dayEnd
+            )
+            sleep = DailyMetricsSleepAggregator.buildSummary(
+                categorySamples: sleepSamples,
+                dayStart: dayStart,
+                dayEnd: dayEnd
+            )
+        } else {
+            sleep = nil
+        }
+
         return DailyAggregationInput(
-            date: day,
-            steps: 0,
-            distanceKm: 0,
-            activeCalories: 0,
-            basalCalories: 0,
-            exerciseMinutes: 0,
-            standHours: 0,
-            restingHeartRate: nil,
-            hrvValues: [],
-            oxygenSaturationValues: [],
+            date: dayKey,
+            steps: steps,
+            distanceKm: distanceKm,
+            activeCalories: activeCalories,
+            basalCalories: basalCalories,
+            exerciseMinutes: exerciseMinutes,
+            standHours: standHours,
+            restingHeartRate: restingHeartRate,
+            hrvValues: hrvValues,
+            oxygenSaturationValues: oxygenSaturationValues,
             heartRateValues: [],
-            sleep: nil,
+            heartRateSummary: heartRateSummary,
+            sleep: sleep,
             syncedAt: syncedAt
         )
     }
 
+    private func cumulativeSum(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        from start: Date,
+        to end: Date
+    ) async throws -> Double {
+        guard let type = HKQuantityType.quantityType(forIdentifier: identifier) else { return 0 }
+        let stats = try await queryStore.statistics(
+            for: type,
+            from: start,
+            to: end,
+            options: [.cumulativeSum]
+        )
+        return stats?.sumQuantity()?.doubleValue(for: unit) ?? 0
+    }
+
+    private func discreteAverage(
+        _ identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        from start: Date,
+        to end: Date
+    ) async throws -> Double? {
+        guard let type = HKQuantityType.quantityType(forIdentifier: identifier) else { return nil }
+        let stats = try await queryStore.statistics(
+            for: type,
+            from: start,
+            to: end,
+            options: [.discreteAverage]
+        )
+        guard let q = stats?.averageQuantity() else { return nil }
+        let v = q.doubleValue(for: unit)
+        return v > 0 ? v : nil
+    }
+
+    private func hrvSampleValues(from start: Date, to end: Date) async throws -> [Double] {
+        guard let type = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else { return [] }
+        let ms = HKUnit.secondUnit(with: .milli)
+        let samples = try await queryStore.quantitySamples(for: type, from: start, to: end)
+        return samples.map { $0.quantity.doubleValue(for: ms) }
+    }
+
+    private func oxygenSamplePercents(from start: Date, to end: Date) async throws -> [Double] {
+        guard let type = HKQuantityType.quantityType(forIdentifier: .oxygenSaturation) else { return [] }
+        let percent = HKUnit.percent()
+        let samples = try await queryStore.quantitySamples(for: type, from: start, to: end)
+        return samples.map { Self.spo2FractionToPercent($0.quantity.doubleValue(for: percent)) }
+    }
+
+    private static func spo2FractionToPercent(_ value: Double) -> Double {
+        if value > 0, value <= 1.0 {
+            return value * 100.0
+        }
+        return value
+    }
+
+    private func heartRateStatistics(from start: Date, to end: Date) async throws -> HeartRateStats? {
+        guard let type = HKQuantityType.quantityType(forIdentifier: .heartRate) else { return nil }
+        let bpm = HKUnit.count().unitDivided(by: HKUnit.minute())
+        let stats = try await queryStore.statistics(
+            for: type,
+            from: start,
+            to: end,
+            options: [.discreteMin, .discreteMax, .discreteAverage]
+        )
+        guard let s = stats else { return nil }
+        let minV = s.minimumQuantity()?.doubleValue(for: bpm)
+        let maxV = s.maximumQuantity()?.doubleValue(for: bpm)
+        let avgV = s.averageQuantity()?.doubleValue(for: bpm)
+        guard let minV, let maxV, let avgV else { return nil }
+        return HeartRateStats(min: minV, max: maxV, average: avgV)
+    }
+
     func makeDailyHealthData(from input: DailyAggregationInput) -> DailyHealthData {
         let heartRateStats: HeartRateStats?
-        if !input.heartRateValues.isEmpty {
+        if let summary = input.heartRateSummary {
+            heartRateStats = summary
+        } else if !input.heartRateValues.isEmpty {
             heartRateStats = HeartRateStats(
                 min: input.heartRateValues.min() ?? 0,
                 max: input.heartRateValues.max() ?? 0,
