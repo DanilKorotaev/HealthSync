@@ -159,7 +159,15 @@ final class SyncServiceTests: XCTestCase {
         XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/daily/2026-06-14.json" })
         XCTAssertTrue(nextcloud.uploads.contains { $0.path == "HealthData/daily/2026-06-13.json" })
         XCTAssertEqual(nextcloud.uploads.count, 4)
-        XCTAssertEqual(webhook.calls.first?.files.count, 4)
+        XCTAssertEqual(
+            webhook.calls.first?.files,
+            [
+                "HealthData/daily/2026-06-15.json",
+                "HealthData/daily/2026-06-14.json",
+                "HealthData/daily/2026-06-13.json",
+                "HealthData/sync_state.json"
+            ]
+        )
     }
 }
 

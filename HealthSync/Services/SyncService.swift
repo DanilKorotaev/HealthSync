@@ -126,11 +126,10 @@ final class SyncService: SyncServiceProtocol {
         let stateData = try encoder.encode(state)
         try await nextcloud.upload(data: stateData, remotePath: Self.syncStatePath, contentType: "application/json")
 
-        var webhookFiles = workoutPaths
-        webhookFiles.append(contentsOf: backfillPaths)
-        webhookFiles.append(dailyPath)
-        webhookFiles.append(Self.syncStatePath)
-        try await webhookClient.postSyncCompleteIfConfigured(date: dayKey, files: webhookFiles)
+        try await webhookClient.postSyncCompleteIfConfigured(
+            date: dayKey,
+            files: Self.webhookFileList(workoutPaths: workoutPaths, dailyPath: dailyPath, backfillPaths: backfillPaths)
+        )
     }
 
     func syncNowUsingBackgroundUploads(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -214,13 +213,13 @@ final class SyncService: SyncServiceProtocol {
                             do {
                                 switch uploadResult {
                                 case .success:
-                                    var webhookFiles = workoutPaths
-                                    webhookFiles.append(contentsOf: backfillPaths)
-                                    webhookFiles.append(dailyPath)
-                                    webhookFiles.append(Self.syncStatePath)
                                     try await self.webhookClient.postSyncCompleteIfConfigured(
                                         date: dayKey,
-                                        files: webhookFiles
+                                        files: Self.webhookFileList(
+                                            workoutPaths: workoutPaths,
+                                            dailyPath: dailyPath,
+                                            backfillPaths: backfillPaths
+                                        )
                                     )
                                     completion(.success(()))
                                 case let .failure(error):
@@ -236,6 +235,15 @@ final class SyncService: SyncServiceProtocol {
                 completion(.failure(error))
             }
         }
+    }
+
+    /// Same order as upload: workouts → today’s daily → backfill dailies → `sync_state`.
+    private static func webhookFileList(workoutPaths: [String], dailyPath: String, backfillPaths: [String]) -> [String] {
+        var files = workoutPaths
+        files.append(dailyPath)
+        files.append(contentsOf: backfillPaths)
+        files.append(Self.syncStatePath)
+        return files
     }
 
     private struct DailyBackfillPayload {
