@@ -1,5 +1,9 @@
 # TODO
 
+## In progress
+
+- [🚧] [HealthKit real daily metrics (replace stub)](tasks/pending/task-feature-healthkit-daily-metrics.md)
+
 ## Planned
 
 ### Product / ops

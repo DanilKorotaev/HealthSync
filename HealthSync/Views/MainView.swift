@@ -3,6 +3,7 @@ import SwiftUI
 struct MainView: View {
     private let syncService: SyncServiceProtocol
     @State private var isSyncing = false
+    @State private var isBackgroundSyncing = false
     @State private var lastSyncMessage: String?
     @State private var syncError: String?
 
@@ -24,7 +25,17 @@ struct MainView: View {
                     Task { await runSync() }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(isSyncing)
+                .disabled(isSyncing || isBackgroundSyncing)
+                Button(isBackgroundSyncing ? "Background sync…" : "Sync (background)") {
+                    Task { await runBackgroundSync() }
+                }
+                .buttonStyle(.bordered)
+                .disabled(isSyncing || isBackgroundSyncing)
+                Text("Background mode uses URLSession background transfers; uploads can finish while the app is not in the foreground.")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
                 if let lastSyncMessage {
                     Text(lastSyncMessage)
                         .font(.caption)
@@ -58,6 +69,27 @@ struct MainView: View {
             lastSyncMessage = "Sync finished."
         } catch {
             syncError = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    private func runBackgroundSync() async {
+        isBackgroundSyncing = true
+        lastSyncMessage = nil
+        syncError = nil
+        defer { isBackgroundSyncing = false }
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            syncService.syncNowUsingBackgroundUploads { result in
+                Task { @MainActor in
+                    switch result {
+                    case .success:
+                        lastSyncMessage = "Background uploads finished."
+                    case let .failure(error):
+                        syncError = error.localizedDescription
+                    }
+                    continuation.resume()
+                }
+            }
         }
     }
 }

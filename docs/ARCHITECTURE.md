@@ -13,7 +13,7 @@ Mirror the design in the knowledge base **Apple Health iOS application** plan:
 
 | Area | Status |
 |------|--------|
-| SwiftUI shell (`MainView`, `SettingsView`) | Main + settings (Nextcloud + notification toggle) |
+| SwiftUI shell (`MainView`, `SettingsView`) | Main: Sync now + **Sync (background)** + settings (Nextcloud + notification toggle) |
 | `AppConfiguration` | Reads `HEALTHSYNC_*` env and UserDefaults; user toggle for background-sync notifications |
 | `HealthKitService` | Explicit read type set + authorization flow + daily/workout mapper aggregation |
 | `HealthStoreAdapter.shared` | Single `HKHealthStore` for reads + background delivery + observer queries |
