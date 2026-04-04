@@ -36,6 +36,7 @@
 		B1E180946477E16B8C6EE73D /* DailyHealthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FABA0C5A2CDD79DFFDA3E7 /* DailyHealthData.swift */; };
 		BEBBDDE75B25818212F15EB3 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */; };
 		C8AEF35C25C4E1D8CCE72E20 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B50444D1E9453BC869D9FAF /* MainView.swift */; };
+		D9797441CC0C2740CD796309 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 811D9FC3339C4F22EEB307F0 /* LaunchScreen.storyboard */; };
 		E78E7BA17FB87769DB5E9E8D /* NextCloudService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202097FCB243CEBE3847B9E0 /* NextCloudService.swift */; };
 		E7DEA0756868976D57F4A230 /* HealthKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E078EE811031A7D5B14835FC /* HealthKitServiceTests.swift */; };
 		ECB8BC8ECA0711B9B0EAC584 /* DailyMetricsSleepAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE94F9BEEA3D985165E7F6CB /* DailyMetricsSleepAggregator.swift */; };
@@ -73,6 +74,7 @@
 		78DD8FE950F7B643D2E37998 /* LocalNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationScheduler.swift; sourceTree = "<group>"; };
 		7AA630B3224FE300C4B6517F /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
 		7D168D7B8E16235EDEF192DE /* AppConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
+		811D9FC3339C4F22EEB307F0 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		81985FF3F8B7DDC9DBE81470 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		857E0DDEA6991A0BF066E1DE /* HealthKitBackgroundObserverRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitBackgroundObserverRegistrar.swift; sourceTree = "<group>"; };
 		867F948486D0BE59811F5219 /* CalendarDayFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayFormatterTests.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			children = (
 				D242B2A9BD67C9562869AFF9 /* Assets.xcassets */,
 				81985FF3F8B7DDC9DBE81470 /* Info.plist */,
+				811D9FC3339C4F22EEB307F0 /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33E0705156CA87C81583B01A /* Assets.xcassets in Resources */,
+				D9797441CC0C2740CD796309 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
