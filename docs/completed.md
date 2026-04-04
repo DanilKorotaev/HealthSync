@@ -12,3 +12,4 @@
 | [HealthKit real daily metrics](tasks/completed/task-feature-healthkit-daily-metrics.md) | 2026-03-31 |
 | [Incremental sync — workouts](tasks/completed/task-feature-sync-incremental-workouts.md) | 2026-03-31 |
 | [Daily JSON backfill (historical non-workout days)](tasks/completed/task-feature-sync-daily-backfill.md) | 2026-03-31 |
+| [Main screen: today preview + last sync time](tasks/completed/task-feature-main-today-preview.md) | 2026-04-05 |

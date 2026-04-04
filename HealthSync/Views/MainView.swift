@@ -2,22 +2,46 @@ import SwiftUI
 
 struct MainView: View {
     private let syncService: SyncServiceProtocol
+    private let healthKit: HealthKitServiceProtocol
     @State private var isSyncing = false
     @State private var isBackgroundSyncing = false
     @State private var lastSyncMessage: String?
     @State private var syncError: String?
+    @State private var todayData: DailyHealthData?
+    @State private var previewError: String?
+    @State private var isPreviewLoading = false
 
-    init(syncService: SyncServiceProtocol = SyncService()) {
+    init(syncService: SyncServiceProtocol = SyncService(), healthKit: HealthKitServiceProtocol = HealthKitService()) {
         self.syncService = syncService
+        self.healthKit = healthKit
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                Text("HealthSync")
-                    .font(.title2.weight(.semibold))
+            VStack(spacing: 20) {
+                if healthKit.isHealthDataAvailable {
+                    if isPreviewLoading {
+                        ProgressView("Loading today…")
+                            .frame(maxWidth: .infinity)
+                    } else if let todayData {
+                        TodayPreviewSection(data: todayData)
+                            .padding(.horizontal)
+                    }
+                    if let previewError {
+                        Text(previewError)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                }
+                if let last = SyncRunStore.lastSuccessfulSyncAt {
+                    Text("Last successful sync: \(last.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
                 Text("Export today’s daily snapshot to Nextcloud (HealthData/) when configured in Settings.")
-                    .font(.footnote)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -32,9 +56,11 @@ struct MainView: View {
                 .buttonStyle(.bordered)
                 .disabled(isSyncing || isBackgroundSyncing)
                 Text("Background mode uses URLSession background transfers; uploads can finish while the app is not in the foreground.")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.tertiary)
                     .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal)
                 if let lastSyncMessage {
                     Text(lastSyncMessage)
@@ -54,7 +80,29 @@ struct MainView: View {
                 .buttonStyle(.bordered)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("Today")
+            .navigationTitle("HealthSync")
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                await refreshTodayPreview()
+            }
+        }
+    }
+
+    @MainActor
+    private func refreshTodayPreview() async {
+        previewError = nil
+        guard healthKit.isHealthDataAvailable else {
+            todayData = nil
+            return
+        }
+        isPreviewLoading = true
+        defer { isPreviewLoading = false }
+        do {
+            let input = try await healthKit.dailyAggregationInput(for: Date())
+            todayData = healthKit.makeDailyHealthData(from: input)
+        } catch {
+            todayData = nil
+            previewError = "Could not load today’s metrics."
         }
     }
 
@@ -67,6 +115,7 @@ struct MainView: View {
         do {
             try await syncService.syncNow()
             lastSyncMessage = "Sync finished."
+            await refreshTodayPreview()
         } catch {
             syncError = error.localizedDescription
         }
@@ -84,6 +133,7 @@ struct MainView: View {
                     switch result {
                     case .success:
                         lastSyncMessage = "Background uploads finished."
+                        await refreshTodayPreview()
                     case let .failure(error):
                         syncError = error.localizedDescription
                     }

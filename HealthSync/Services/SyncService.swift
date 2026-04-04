@@ -130,6 +130,7 @@ final class SyncService: SyncServiceProtocol {
             date: dayKey,
             files: Self.webhookFileList(workoutPaths: workoutPaths, dailyPath: dailyPath, backfillPaths: backfillPaths)
         )
+        SyncRunStore.recordSuccess(at: clock())
     }
 
     func syncNowUsingBackgroundUploads(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -221,6 +222,7 @@ final class SyncService: SyncServiceProtocol {
                                             backfillPaths: backfillPaths
                                         )
                                     )
+                                    SyncRunStore.recordSuccess(at: self.clock())
                                     completion(.success(()))
                                 case let .failure(error):
                                     completion(.failure(error))
