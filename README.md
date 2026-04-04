@@ -39,4 +39,4 @@ Full details: [docs/SETUP.md](docs/SETUP.md).
 
 ## License
 
-TBD (add a `LICENSE` file when you choose a license for the public repo).
+This project is licensed under the [MIT License](LICENSE).

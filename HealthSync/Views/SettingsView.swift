@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var webhookURL: String = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookURL) ?? ""
     @State private var webhookToken: String = AppConfiguration.string(for: AppConfiguration.Keys.syncWebhookToken) ?? ""
     @State private var backgroundSyncNotifications = AppConfiguration.backgroundSyncNotificationsEnabled
+    @State private var backgroundSyncEnabled = AppConfiguration.backgroundSyncEnabled
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var connectionStatus: String?
@@ -20,6 +21,17 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                Toggle("Background sync (HealthKit)", isOn: $backgroundSyncEnabled)
+                    .onChange(of: backgroundSyncEnabled) { _, newValue in
+                        AppConfiguration.setBackgroundSyncEnabled(newValue)
+                        BackgroundSyncCoordinator.shared.syncWithUserPreference()
+                    }
+            } header: {
+                Text("Sync")
+            } footer: {
+                Text("When on, new Health data can trigger a background upload to Nextcloud. Turn off to save battery if you only sync manually.")
+            }
             Section {
                 Toggle("Notify when background sync finishes", isOn: $backgroundSyncNotifications)
                     .onChange(of: backgroundSyncNotifications) { _, newValue in

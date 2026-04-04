@@ -5,13 +5,13 @@ import HealthKit
 final class BackgroundSyncCoordinator {
     static let shared = BackgroundSyncCoordinator()
 
-    private let lock = NSLock()
-    private var didStart = false
+    private let observationState = ObservationStateHolder()
 
     private let registrar: HealthKitBackgroundObserverRegistrarProtocol
     private let syncService: SyncServiceProtocol
     private let notificationScheduler: LocalNotificationSchedulingProtocol
     private let isHealthDataAvailable: () -> Bool
+    private let isBackgroundSyncEnabled: () -> Bool
     private let sampleTypesProvider: () -> [HKSampleType]
 
     init(
@@ -19,6 +19,7 @@ final class BackgroundSyncCoordinator {
         syncService: SyncServiceProtocol = SyncService(),
         notificationScheduler: LocalNotificationSchedulingProtocol = LocalNotificationScheduler(),
         isHealthDataAvailable: @escaping () -> Bool = { HealthStoreAdapter.shared.isHealthDataAvailable },
+        isBackgroundSyncEnabled: @escaping () -> Bool = { AppConfiguration.backgroundSyncEnabled },
         sampleTypesProvider: @escaping () -> [HKSampleType] = {
             HealthKitService().requiredReadTypes.compactMap { $0 as? HKSampleType }
         }
@@ -27,20 +28,30 @@ final class BackgroundSyncCoordinator {
         self.syncService = syncService
         self.notificationScheduler = notificationScheduler
         self.isHealthDataAvailable = isHealthDataAvailable
+        self.isBackgroundSyncEnabled = isBackgroundSyncEnabled
         self.sampleTypesProvider = sampleTypesProvider
     }
 
-    func startIfNeeded() {
-        lock.lock()
-        if didStart {
-            lock.unlock()
-            return
-        }
-        didStart = true
-        lock.unlock()
-
+    /// Aligns HealthKit observers with the user setting (call at launch and when the toggle changes).
+    func syncWithUserPreference() {
         Task {
-            guard isHealthDataAvailable() else { return }
+            await applyPreference()
+        }
+    }
+
+    /// @deprecated Use `syncWithUserPreference()` — kept for tests by name.
+    func startIfNeeded() {
+        syncWithUserPreference()
+    }
+
+    private func applyPreference() async {
+        guard isHealthDataAvailable() else { return }
+
+        let enabled = isBackgroundSyncEnabled()
+        let wasActive = await observationState.isObservationActive()
+
+        if enabled {
+            if wasActive { return }
             let types = sampleTypesProvider()
             do {
                 try await registrar.startObserving(sampleTypes: types) { done in
@@ -58,11 +69,28 @@ final class BackgroundSyncCoordinator {
                         }
                     }
                 }
+                await observationState.setObservationActive(true)
             } catch {
                 await self.notificationScheduler.notifySyncFailedIfEnabled(
                     errorDescription: error.localizedDescription
                 )
             }
+        } else {
+            guard wasActive else { return }
+            await registrar.stopObserving()
+            await observationState.setObservationActive(false)
         }
+    }
+}
+
+private actor ObservationStateHolder {
+    private var observationActive = false
+
+    func isObservationActive() -> Bool {
+        observationActive
+    }
+
+    func setObservationActive(_ value: Bool) {
+        observationActive = value
     }
 }

@@ -15,6 +15,8 @@ enum AppConfiguration {
 
     enum UserSettingsKeys {
         static let backgroundSyncNotifications = "healthsync.settings.background_sync_notifications"
+        /// When `true`, registers HealthKit observer queries for background sync (default on).
+        static let backgroundSyncEnabled = "healthsync.settings.background_sync_enabled"
     }
 
     static var backgroundSyncNotificationsEnabled: Bool {
@@ -23,6 +25,18 @@ enum AppConfiguration {
 
     static func setBackgroundSyncNotificationsEnabled(_ value: Bool) {
         UserDefaults.standard.set(value, forKey: UserSettingsKeys.backgroundSyncNotifications)
+    }
+
+    /// User toggle: HealthKit-driven background sync. Default `true` when key is unset.
+    static var backgroundSyncEnabled: Bool {
+        if UserDefaults.standard.object(forKey: UserSettingsKeys.backgroundSyncEnabled) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: UserSettingsKeys.backgroundSyncEnabled)
+    }
+
+    static func setBackgroundSyncEnabled(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: UserSettingsKeys.backgroundSyncEnabled)
     }
 
     static func string(for key: String) -> String? {

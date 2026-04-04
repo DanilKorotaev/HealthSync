@@ -13,10 +13,11 @@ final class BackgroundSyncCoordinatorTests: XCTestCase {
             syncService: SyncServiceNeverCalled(),
             notificationScheduler: NotificationSchedulerMock(),
             isHealthDataAvailable: { true },
+            isBackgroundSyncEnabled: { true },
             sampleTypesProvider: { [] }
         )
 
-        coordinator.startIfNeeded()
+        coordinator.syncWithUserPreference()
         await fulfillment(of: [exp], timeout: 2.0)
         XCTAssertEqual(mock.startObservingCallCount, 1)
     }
@@ -28,10 +29,11 @@ final class BackgroundSyncCoordinatorTests: XCTestCase {
             syncService: SyncServiceNeverCalled(),
             notificationScheduler: NotificationSchedulerMock(),
             isHealthDataAvailable: { false },
+            isBackgroundSyncEnabled: { true },
             sampleTypesProvider: { [] }
         )
 
-        coordinator.startIfNeeded()
+        coordinator.syncWithUserPreference()
         try? await Task.sleep(nanoseconds: 300_000_000)
         XCTAssertEqual(mock.startObservingCallCount, 0)
     }
@@ -43,13 +45,30 @@ final class BackgroundSyncCoordinatorTests: XCTestCase {
             syncService: SyncServiceNeverCalled(),
             notificationScheduler: NotificationSchedulerMock(),
             isHealthDataAvailable: { true },
+            isBackgroundSyncEnabled: { true },
             sampleTypesProvider: { [] }
         )
 
-        coordinator.startIfNeeded()
-        coordinator.startIfNeeded()
+        coordinator.syncWithUserPreference()
+        coordinator.syncWithUserPreference()
         try? await Task.sleep(nanoseconds: 300_000_000)
         XCTAssertEqual(mock.startObservingCallCount, 1)
+    }
+
+    func testSyncSkippedWhenBackgroundSyncDisabled() async {
+        let mock = RegistrarMock()
+        let coordinator = BackgroundSyncCoordinator(
+            registrar: mock,
+            syncService: SyncServiceNeverCalled(),
+            notificationScheduler: NotificationSchedulerMock(),
+            isHealthDataAvailable: { true },
+            isBackgroundSyncEnabled: { false },
+            sampleTypesProvider: { [] }
+        )
+
+        coordinator.syncWithUserPreference()
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertEqual(mock.startObservingCallCount, 0)
     }
 }
 
@@ -68,6 +87,8 @@ private final class RegistrarMock: HealthKitBackgroundObserverRegistrarProtocol 
         startObservingCallCount += 1
         onStarted?()
     }
+
+    func stopObserving() async {}
 }
 
 private final class SyncServiceNeverCalled: SyncServiceProtocol {

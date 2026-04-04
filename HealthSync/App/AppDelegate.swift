@@ -6,7 +6,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        BackgroundSyncCoordinator.shared.startIfNeeded()
+        BackgroundSyncCoordinator.shared.syncWithUserPreference()
         return true
     }
 

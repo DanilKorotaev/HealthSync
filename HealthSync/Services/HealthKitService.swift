@@ -65,6 +65,7 @@ protocol HealthStoreProtocol {
 /// HealthKit APIs needed for background delivery and observer queries (same `HKHealthStore` as reads).
 protocol HKBackgroundCapableHealthStore: AnyObject, HealthStoreProtocol {
     func enableBackgroundDelivery(for objectType: HKObjectType, frequency: HKUpdateFrequency) async throws
+    func disableBackgroundDelivery(for objectType: HKObjectType) async throws
     func execute(query: HKQuery)
     func stop(query: HKQuery)
 }
@@ -95,6 +96,20 @@ final class HealthStoreAdapter: HKBackgroundCapableHealthStore {
     func enableBackgroundDelivery(for objectType: HKObjectType, frequency: HKUpdateFrequency) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             healthStore.enableBackgroundDelivery(for: objectType, frequency: frequency) { success, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else if success {
+                    continuation.resume(returning: ())
+                } else {
+                    continuation.resume(throwing: HealthKitServiceError.backgroundDeliveryEnableFailed)
+                }
+            }
+        }
+    }
+
+    func disableBackgroundDelivery(for objectType: HKObjectType) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            healthStore.disableBackgroundDelivery(for: objectType) { success, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else if success {

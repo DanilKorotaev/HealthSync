@@ -42,3 +42,5 @@ Workouts use `HKAnchoredObjectQuery`. For steps, energy, sleep summaries, and re
 - New logic must be covered by tests (unit first, integration where meaningful).
 
 See the implementation plan in the knowledge base for JSON schemas and folder layout.
+
+For **sync ordering**, **remote state fields**, and **error surfaces**, see [SYNC_AND_FAILURES.md](SYNC_AND_FAILURES.md).

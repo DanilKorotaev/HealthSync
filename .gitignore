@@ -1,0 +1,11 @@
+# Xcode / Cursor
+**/xcuserdata/
+*.xcuserstate
+*.xccheckout
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Local secrets (see docs/SETUP.md)
+Config/Secrets.xcconfig
