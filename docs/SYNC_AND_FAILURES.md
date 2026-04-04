@@ -5,7 +5,7 @@ This document complements [ARCHITECTURE.md](ARCHITECTURE.md): one full **foregro
 ## JSON schema source of truth
 
 - **Daily and workout JSON** field names and semantics are defined in the knowledge base implementation plan — **section 4 (*Формат и хранение данных*)** in  
-  `Документация/Задачи/Apple Health iOS приложение — план реализации.md`  
+  `Документация/Задачи/выполненные/Apple Health iOS приложение — план реализации.md`  
   (same tree as the HealthSync repo when synced via Nextcloud).
 - **App version `0.1.0`** (see `project.yml` / Xcode) does **not** embed a `schema_version` field inside exported JSON files. If the export shape changes in a breaking way, add a version field and document the migration here.
 

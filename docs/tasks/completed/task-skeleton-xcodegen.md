@@ -16,4 +16,4 @@ Created the repository skeleton: SwiftUI app entry, placeholder services, Health
 
 ## Related
 
-- Knowledge base: `Документация/Задачи/Apple Health iOS приложение — план реализации.md`
+- Knowledge base: `Документация/Задачи/выполненные/Apple Health iOS приложение — план реализации.md`
